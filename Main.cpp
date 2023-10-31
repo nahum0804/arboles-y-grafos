@@ -55,7 +55,7 @@ int main()
 {
     string origen, destino;
     // Vertice lsit
-    Vertice *listaVertices = nullptr;
+    list<Vertice> listaVertices;
 
     //-------- Carga de Datos ---------
 
@@ -149,7 +149,7 @@ int main()
     showVerticeData(&v13);
 
     // Add vertices to list
-    listaVertices = &v1;
+    listaVertices.push_back(&v1);
 
     //-------- Menu ---------
     int opcion = 0;
