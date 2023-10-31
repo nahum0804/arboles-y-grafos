@@ -3,90 +3,115 @@
 
 using namespace std;
 
-Arco::Arco(int dist, Vertice* dest) : distancia(dist), destino(dest) {}
+Arco::Arco(int dist, Vertice *dest) : distancia(dist), destino(dest) {}
 
 // Implementación del constructor de Vertice
-Vertice::Vertice(const string& nombre) : nombre(nombre) {}
+Vertice::Vertice(const string &nombre) : nombre(nombre) {}
 
 // Implementación de la función para agregar actividades
-void Vertice::addActividad(const string& actividad) {
+void Vertice::addActividad(const string &actividad)
+{
     actividades.push_back(actividad);
 }
 
 // Implementación de la función para agregar arcos
 void Vertice::addArco(int distancia, Vertice* destino) {
-    arcos.push_back(Arco(distancia, destino));
+    // Verificar si el arco ya existe en el vector de arcos
+    for (const Arco& arco : arcos) {
+        if (arco.destino == destino) {
+            // El arco ya existe, no es necesario agregarlo de nuevo
+            return;
+        }
+    }
+    // Agregar el arco si no existe
+    arcos.push_back({distancia, destino});
+    destino->arcos.push_back({distancia, this});
 }
 
 
-//Prototypes 
-void showVerticeData(Vertice* vertice);
+
+// Prototypes
+void cargarDatos();
+void registrarActividades();
+
+void showVerticeData(Vertice *vertice);
+void calcDistancia(Vertice *orige, Vertice *destino);
+void logUser();
+
+void createVertice(string nombre);
+void deleteVertice(string nombre);
+void modificarVertice(string nombre);
+
+void createArco(string origen, string destino);
+void deleteArco(string origen, string destino);
+void modificarArco(string origen, string destino);
+
+void showRutaCorta(string origen, string destino, Vertice *listaVertices);
+void showActividaesPosibles(string destino, Vertice *listaVertices);
+void showListaGlobalActividades();
 
 
-int main() {
+
+
+
+
+
+int main()
+{
+    string origen, destino;
+    //Vertice lsit
+    Vertice *listaVertices = nullptr;
+
 
     //-------- Carga de Datos ---------
 
     // Creación de vértices
     Vertice v1("Ciudad Quesada");
     Vertice v2("La Fortuna");
-    Vertice v3("Rio Celeste");
-    Vertice v4("Poas");
+    Vertice v3("Florencia");
+    Vertice v4("Zarcero");
     Vertice v5("San Jose");
     Vertice v6("Liberia");
     Vertice v7("Pital");
+    Vertice v8("Aguas Zarcas");
+    Vertice v9("Zarcero");
+    Vertice v10("Muelle");
+    Vertice v11("Platanar");
+    Vertice v12("Venecia");
+    Vertice v13("Rio Cuarto");
+
+
 
     // Conexiones entre vértices (arcos)
-    v1.addArco(30, &v2);
-    v1.addArco(50, &v3);
-    v1.addArco(40, &v4);
-    v1.addArco(80, &v5);
-    v1.addArco(110, &v6);
-    v1.addArco(20, &v7);
+    v1.addArco(15, &v3);
+    v1.addArco(25, &v8);
+    v1.addArco(40, &v9);
 
-    v2.addArco(30, &v1);
-    v2.addArco(20, &v3);
-    v2.addArco(40, &v4);
-    v2.addArco(70, &v5);
-    v2.addArco(100, &v6);
-    v2.addArco(50, &v7);
+    v3.addArco(10, &v11);
+    v3.addArco(35, &v2);
 
-    v3.addArco(50, &v1);
-    v3.addArco(20, &v2);
-    v3.addArco(30, &v4);
-    v3.addArco(60, &v5);
-    v3.addArco(90, &v6);
-    v3.addArco(70, &v7);
+    v6.addArco(110, &v2);
 
-    v4.addArco(40, &v1);
-    v4.addArco(30, &v2);
-    v4.addArco(30, &v3);
-    v4.addArco(50, &v5);
-    v4.addArco(80, &v6);
-    v4.addArco(60, &v7);
+    v8.addArco(15, &v7);
+    v8.addArco(10, &v12);
 
-    v5.addArco(80, &v1);
-    v5.addArco(70, &v2);
-    v5.addArco(60, &v3);
-    v5.addArco(50, &v4);
-    v5.addArco(30, &v6);
-    v5.addArco(90, &v7);
+    v9.addArco(90, &v5);
 
-    v6.addArco(110, &v1);
-    v6.addArco(100, &v2);
-    v6.addArco(90, &v3);
-    v6.addArco(80, &v4);
-    v6.addArco(30, &v5);
-    v6.addArco(120, &v7);
+    v10.addArco(30, &v2);
+    v10.addArco(15, &v11);
+    v10.addArco(25, &v7);
 
-    v7.addArco(20, &v1);
-    v7.addArco(50, &v2);
-    v7.addArco(70, &v3);
-    v7.addArco(60, &v4);
-    v7.addArco(90, &v5);
-    v7.addArco(120, &v6);
+    v12.addArco(20, &v7);
 
-    //Agregando actividades
+    v13.addArco(30, &v12);
+    v13.addArco(50, &v7);
+    v13.addArco(110, &v5);
+
+
+  
+
+
+    // Agregando actividades
     v1.addActividad("Shopping");
     v1.addActividad("Ir al parque");
     v1.addActividad("Ir al Mall");
@@ -120,9 +145,7 @@ int main() {
 
     //-------- Carga de Datos ---------
 
-
-
-    //Mostrar las conexiones de cada vertice y mostrarlas
+    // Mostrar las conexiones de cada vertice y mostrarlas
     showVerticeData(&v1);
     showVerticeData(&v2);
     showVerticeData(&v3);
@@ -130,23 +153,127 @@ int main() {
     showVerticeData(&v5);
     showVerticeData(&v6);
     showVerticeData(&v7);
+    showVerticeData(&v8);
+    showVerticeData(&v9);
+    showVerticeData(&v10);
+    showVerticeData(&v11);
+    showVerticeData(&v12);
+    showVerticeData(&v13);
+
+    //Add vertices to list
+    listaVertices = &v1;
+
+
+    //-------- Menu ---------
+    int opcion = 0;
+    do
+    {
+        cout << "\n\033[1mMenu:\033[0m" << endl;
+        cout << "1. Escoger un destino" << endl;
+        cout << "2. Salir" << endl;
+        cout << "Ingrese una opcion: ";
+        cin >> opcion;
+
+        switch (opcion)
+        {
+        case 1:
+            cout << "Opcion 1 escogida\n"<< endl;
+            cout << "Ingrese el nombre del punto de origen: ";
+            cin >> origen;
+            cin.ignore();
+            cout << "Ingrese el nombre de la punto de destino: ";
+            cin >> destino;
+            cin.ignore();
+            showRutaCorta(origen, destino, listaVertices);
+            break;
+        case 2:
+            cout << "Opcion 2" << endl;
+            break;
+        case 3:
+            cout << "Saliendo..." << endl;
+            break;
+        default:
+            cout << "Opcion invalida" << endl;
+            break;
+        }
+    } while (opcion != 3);
 
     return 0;
 }
 
-
-void showVerticeData(Vertice *v){
-    cout << "\n--------------------------------------------------------" << endl; 
+void showVerticeData(Vertice *v)
+{
+    cout << "\n--------------------------------------------------------" << endl;
     cout << "\033[1mDesde " << v->nombre << " se puede ir a:\033[0m " << endl;
-    for (auto arco : v->arcos) {
+    for (auto arco : v->arcos)
+    {
         cout << arco.destino->nombre << ". Distancia: " << arco.distancia << " km." << endl;
     }
 
-    //Mostras actividades de cada vertice
+    // Mostras actividades de cada vertice
     cout << "\033[1mActividades en " << v->nombre << ":\033[0m " << endl;
-    for (auto actividad : v->actividades) {
+    if(v->actividades.empty()){
+        cout << "No hay actividades disponibles" << endl;
+        return;
+    }
+    for (auto actividad : v->actividades)
+    {
         cout << actividad << endl;
     }
 
-    cout << "--------------------------------------------------------" << endl; 
+    cout << "--------------------------------------------------------" << endl;
+}
+
+void calcDistancia(Vertice *origen, Vertice *destino)
+{
+    cout << "Distancia entre " << origen->nombre << " y " << destino->nombre << ": " << endl;
+}
+
+
+Vertice *getVertice(string nombre, Vertice *listaVertices)
+{
+    Vertice *verticeActual = listaVertices;
+    cout << "Buscando vertice con nombre: " << endl;
+    //Move using arcos
+    for(auto var : verticeActual->arcos){
+        cout << var.destino->nombre << endl;
+        if(var.destino->nombre == nombre){
+            return var.destino;
+        }
+    }
+
+    // Si no se encontró el vértice, devuelve nullptr
+    cout << "Vertice no encontrado (NO colinda con el punto de salida)" << endl;
+    return nullptr;
+}
+
+
+void logUser(){
+    
+}
+
+void showRutaCorta(string origen, string destino, Vertice *listaVertices)
+{
+    //Search for the vertex with the given name
+    Vertice *origenVertice = getVertice(origen, listaVertices);
+    Vertice *destinoVertice = getVertice(destino, listaVertices);
+
+    //Calculate the distance between the two vertices
+    calcDistancia(origenVertice, destinoVertice);
+
+    //Show the possible activities in the destination vertex
+    showActividaesPosibles(destino, listaVertices);
+}
+
+void showActividaesPosibles(string destino, Vertice *listaVertices)
+{
+    //Search for the vertex with the given name
+    Vertice *destinoVertice = getVertice(destino, listaVertices);
+
+    //Show the possible activities in the destination vertex
+    cout << "Actividades en " << destinoVertice->nombre << ": " << endl;
+    for (auto actividad : destinoVertice->actividades)
+    {
+        cout << actividad << endl;
+    }
 }
