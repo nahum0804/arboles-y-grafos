@@ -34,5 +34,17 @@ struct Vertice {
     void removeArco(const Arco& arco);
 };
 
+struct Persona {
+    string genero;
+    int edad;
+    Vertice* origen;
+    Vertice* destino;
+    string actividad;
+};
+
+
+struct Nodo {
+    Nodo* siguiente;
+};
 
 #endif
