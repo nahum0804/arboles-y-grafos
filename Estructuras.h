@@ -21,6 +21,7 @@ struct Vertice {
     list<string> actividades;
     list<Arco> arcos;
     Vertice* siguiente;
+    bool visitado = false;
 
     // Constructor
     Vertice(const string& nombre);

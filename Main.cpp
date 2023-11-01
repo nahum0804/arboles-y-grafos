@@ -1,6 +1,9 @@
 #include <iostream>
 #include "Estructuras.h"
 #include <list>
+#include <unordered_map>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -32,12 +35,15 @@ void Vertice::addArco(int distancia, Vertice *destino)
     destino->arcos.push_back({distancia, this});
 }
 
+unordered_map<Vertice*, int> distancia_minima;
+unordered_map<Vertice*, Vertice*> padre;
+
 // Prototypes
 void cargarDatos();
 void registrarActividades();
 
 void showVerticeData(Vertice *vertice);
-void calcDistancia(Vertice* origen, Vertice* destino);
+void calcDistancia(Vertice* origen, Vertice* destino, string ruta, int dis);
 
 void createVertice(string nombre);
 void deleteVertice(string nombre);
@@ -54,6 +60,9 @@ void showListaGlobalActividades();
 void getListaVertices(list<Vertice*> *listaVertices);
 Vertice* getVertice(const string& nombre, list<Vertice*> *listaVertices);
 
+void dijkstra(Vertice* inicio, Vertice* destino);
+
+
 int main()
 {
     string origen, destino;
@@ -62,19 +71,18 @@ int main()
     //-------- Carga de Datos ---------
 
     // Creación de vértices
-    Vertice v1("Ciudad Quesada");
-    Vertice v2("La Fortuna");
+    Vertice v1("Ciudad_Quesada");
+    Vertice v2("La_Fortuna");
     Vertice v3("Florencia");
-    Vertice v4("Zarcero");
-    Vertice v5("San Jose");
+    Vertice v5("San_Jose");
     Vertice v6("Liberia");
     Vertice v7("Pital");
-    Vertice v8("Aguas Zarcas");
+    Vertice v8("Aguas_Zarcas");
     Vertice v9("Zarcero");
     Vertice v10("Muelle");
     Vertice v11("Platanar");
     Vertice v12("Venecia");
-    Vertice v13("Rio Cuarto");
+    Vertice v13("Rio_Cuarto");
 
     // Conexiones entre vértices (arcos)
     v1.addArco(15, &v3);
@@ -115,11 +123,6 @@ int main()
     v3.addActividad("Senderismo");
     v3.addActividad("Observación de aves");
 
-    v4.addActividad("Senderismo");
-    v4.addActividad("Visitar el parque nacional");
-    v4.addActividad("Ver el volcan Poas");
-    v4.addActividad("Quemaderos");
-
     v5.addActividad("Ir al Mall");
     v5.addActividad("Ir al parque");
     v5.addActividad("Ir al cine");
@@ -154,7 +157,6 @@ int main()
     listaVertices.push_back(&v1);
     listaVertices.push_back(&v2);
     listaVertices.push_back(&v3);
-    listaVertices.push_back(&v4);
     listaVertices.push_back(&v5);
     listaVertices.push_back(&v6);
     listaVertices.push_back(&v7);
@@ -186,7 +188,8 @@ int main()
     cout << destinoVertice << endl;
     cout << "Ciudad de destino: " << destinoVertice->nombre << endl;
 
-    calcDistancia(origenVertice , destinoVertice);
+    calcDistancia(origenVertice, destinoVertice," ",0);
+    //dijkstra(origenVertice, destinoVertice);
 
     // //-------- Menu ---------
     // int opcion = 0;
@@ -250,9 +253,23 @@ int main()
 //     cout << "--------------------------------------------------------" << endl;
 // }
 
-void calcDistancia(Vertice *origen, Vertice *destino)
+void calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
 {
-    cout << "Distancia entre " << origen->nombre << " y " << destino->nombre << ": " << endl;
+        if((origen == NULL) or (origen->visitado== true))
+           return;
+
+        if(origen->nombre == destino->nombre){
+                cout<<"\nLa ruta es: "<<ruta<<destino->nombre<<" La distancia es: "<<dis;
+                    return;
+        }
+        origen->visitado = true;
+
+        list<Arco>::iterator tempA =origen->arcos.begin();
+        while(tempA != origen->arcos.end()){
+           calcDistancia (tempA->destino, destino,  ruta+origen->nombre, dis + tempA->distancia);
+            tempA ++;
+        }
+       origen->visitado = false;
 }
 
 
@@ -299,4 +316,55 @@ Vertice* getVertice(const string& nombre, list<Vertice*> *listaVertices) {
 //     {
 //         cout << actividad << endl;
 //     }
+// }
+
+// void dijkstra(Vertice* inicio, Vertice* destino) {
+//     // Inicializa las estructuras de datos.
+//     priority_queue<pair<int, Vertice*>> cola_prioridad;
+//     distancia_minima.clear();
+//     padre.clear();
+
+//     for (auto vertice : listaVertices) {
+//         distancia_minima[vertice] = INT_MAX;
+//         padre[vertice] = nullptr;
+//     }
+
+//     distancia_minima[inicio] = 0;
+//     cola_prioridad.push({0, inicio});
+
+//     while (!cola_prioridad.empty()) {
+//         int distancia_actual = -cola_prioridad.top().first;
+//         Vertice* vertice_actual = cola_prioridad.top().second;
+//         cola_prioridad.pop();
+
+//         // Implementa la lógica de Dijkstra para explorar los vértices adyacentes.
+
+//         for (const Arco& arco : vertice_actual->arcos) {
+//             Vertice* vecino = arco.destino;
+//             int distancia_arco = arco.distancia;
+//             int distancia_nueva = distancia_minima[vertice_actual] + distancia_arco;
+
+//             if (distancia_nueva < distancia_minima[vecino]) {
+//                 distancia_minima[vecino] = distancia_nueva;
+//                 padre[vecino] = vertice_actual;
+//                 cola_prioridad.push({-distancia_nueva, vecino});
+//             }
+//         }
+//     }
+
+//     // Reconstruye la ruta más corta desde el vértice de inicio hasta el vértice objetivo.
+//     Vertice* actual = destino;
+//     list<Vertice*> ruta_corta;
+//     while (actual != nullptr) {
+//         ruta_corta.push_front(actual);
+//         actual = padre[actual];
+//     }
+
+//     // Muestra la distancia mínima y la ruta más corta.
+//     cout << "Distancia mínima: " << distancia_minima[destino] << endl;
+//     cout << "Ruta más corta: ";
+//     for (Vertice* v : ruta_corta) {
+//         cout << v->nombre << " -> ";
+//     }
+//     cout << endl;
 // }
