@@ -35,15 +35,15 @@ void Vertice::addArco(int distancia, Vertice *destino)
     destino->arcos.push_back({distancia, this});
 }
 
-unordered_map<Vertice*, int> distancia_minima;
-unordered_map<Vertice*, Vertice*> padre;
+unordered_map<Vertice *, int> distancia_minima;
+unordered_map<Vertice *, Vertice *> padre;
 
 // Prototypes
 void cargarDatos();
 void registrarActividades();
 
 void showVerticeData(Vertice *vertice);
-void calcDistancia(Vertice* origen, Vertice* destino, string ruta, int dis);
+int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis);
 
 void createVertice(string nombre);
 void deleteVertice(string nombre);
@@ -57,16 +57,15 @@ void showRutaCorta(string origen, string destino, Vertice *listaVertices);
 void showActividaesPosibles(string destino, Vertice *listaVertices);
 void showListaGlobalActividades();
 
-void getListaVertices(list<Vertice*> *listaVertices);
-Vertice* getVertice(const string& nombre, list<Vertice*> *listaVertices);
+void getListaVertices(list<Vertice *> *listaVertices);
+Vertice *getVertice(const string &nombre, list<Vertice *> *listaVertices);
 
-void dijkstra(Vertice* inicio, Vertice* destino);
-
+void dijkstra(Vertice *inicio, Vertice *destino);
 
 int main()
 {
     string origen, destino;
-    list<Vertice*> listaVertices;
+    list<Vertice *> listaVertices;
 
     //-------- Carga de Datos ---------
 
@@ -167,7 +166,7 @@ int main()
     listaVertices.push_back(&v12);
     listaVertices.push_back(&v13);
 
-    //Show lista
+    // Show lista
     getListaVertices(&listaVertices);
 
     string ciudad1, ciudad2;
@@ -182,14 +181,16 @@ int main()
     Vertice *origenVertice = getVertice(ciudad1, &listaVertices);
     Vertice *destinoVertice = getVertice(ciudad2, &listaVertices);
 
-    //Show ciudades selected
+    // Show ciudades selected
     cout << origenVertice << endl;
     cout << "Ciudad de partida: " << origenVertice->nombre << endl;
     cout << destinoVertice << endl;
     cout << "Ciudad de destino: " << destinoVertice->nombre << endl;
 
-    calcDistancia(origenVertice, destinoVertice," ",0);
-    //dijkstra(origenVertice, destinoVertice);
+    int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
+    cout << "\nLa ruta es: " << origenVertice->nombre + "-" + destinoVertice->nombre << "La distancia es: " << dist;
+
+    // dijkstra(origenVertice, destinoVertice);
 
     // //-------- Menu ---------
     // int opcion = 0;
@@ -252,37 +253,49 @@ int main()
 
 //     cout << "--------------------------------------------------------" << endl;
 // }
-
-void calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
+int distanciaMenor = 0;
+string rutaMenor = "";
+int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
 {
-        if((origen == NULL) or (origen->visitado== true))
-           return;
+    if ((origen == NULL) or (origen->visitado == true))
+        return 0;
 
-        if(origen->nombre == destino->nombre){
-                cout<<"\nLa ruta es: "<<ruta<<destino->nombre<<" La distancia es: "<<dis;
-                    return;
+    if (origen->nombre == destino->nombre)
+    {
+        if ((distanciaMenor == 0) || (dis < distanciaMenor))
+        {
+            distanciaMenor = dis;
+            rutaMenor = ruta + "-" + destino->nombre;
+            // cout << "\nLa ruta es: " << rutaMenor << "La distancia es: " <distanciaMenor;
         }
-        origen->visitado = true;
+    }
+    origen->visitado = true;
 
-        list<Arco>::iterator tempA =origen->arcos.begin();
-        while(tempA != origen->arcos.end()){
-           calcDistancia (tempA->destino, destino,  ruta+origen->nombre, dis + tempA->distancia);
-            tempA ++;
-        }
-       origen->visitado = false;
+    list<Arco>::iterator tempA = origen->arcos.begin();
+    while (tempA != origen->arcos.end())
+    {
+        calcDistancia(tempA->destino, destino, ruta + origen->nombre, dis + tempA->distancia);
+        tempA++;
+    }
+    origen->visitado = false;
+    return distanciaMenor;
 }
 
-
-void getListaVertices(list<Vertice*> *listaVertices) {
-    for (auto vertice : *listaVertices) {
+void getListaVertices(list<Vertice *> *listaVertices)
+{
+    for (auto vertice : *listaVertices)
+    {
         cout << vertice << endl;
         cout << vertice->nombre << endl;
     }
 }
 
-Vertice* getVertice(const string& nombre, list<Vertice*> *listaVertices) {
-    for (auto vertice : *listaVertices) {
-        if (vertice->nombre == nombre) {
+Vertice *getVertice(const string &nombre, list<Vertice *> *listaVertices)
+{
+    for (auto vertice : *listaVertices)
+    {
+        if (vertice->nombre == nombre)
+        {
             cout << vertice << endl;
             return vertice;
         }
@@ -290,7 +303,6 @@ Vertice* getVertice(const string& nombre, list<Vertice*> *listaVertices) {
     cout << "No se encontro el vertice" << endl;
     return nullptr;
 }
-
 
 // void showRutaCorta(string origen, string destino, list<Vertice> *listaVertices)
 // {
