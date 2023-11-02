@@ -41,6 +41,8 @@ struct Persona {
     Vertice* origen;
     Vertice* destino;
     string actividad;
+
+    Persona(const string genero, int edad, Vertice* origen, Vertice* destino, const string actividad);
 };
 
 

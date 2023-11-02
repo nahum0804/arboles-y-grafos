@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
+#include <fstream>
 
 using namespace std;
 
@@ -35,8 +36,8 @@ void Vertice::addArco(int distancia, Vertice *destino)
     destino->arcos.push_back({distancia, this});
 }
 
-unordered_map<Vertice *, int> distancia_minima;
-unordered_map<Vertice *, Vertice *> padre;
+Persona::Persona(string genero, int edad, Vertice *origen, Vertice *destino, string actividad) : genero(genero), edad(edad), origen(origen), destino(destino), actividad(actividad) {}
+
 
 // Prototypes
 void cargarDatos();
@@ -55,7 +56,7 @@ void modificarArco(string origen, string destino);
 
 void showRutaCorta(string origen, string destino, Vertice *listaVertices);
 void showActividaesPosibles(string destino, Vertice *listaVertices);
-void showListaGlobalActividades();
+string getActividad(string actividad, Vertice *listaVertices);
 
 void getListaVertices(list<Vertice *> *listaVertices);
 Vertice *getVertice(const string &nombre, list<Vertice *> *listaVertices);
@@ -119,38 +120,34 @@ int main()
     v2.addActividad("Observación de aves");
     v2.addActividad("Serpentario");
 
-    v3.addActividad("Senderismo");
-    v3.addActividad("Observación de aves");
+    v3.addActividad("Ir al Rio");
 
+    v5.addActividad("Ir al Museo");
+    v5.addActividad("Ir al Teatro");
     v5.addActividad("Ir al Mall");
-    v5.addActividad("Ir al parque");
-    v5.addActividad("Ir al cine");
-    v5.addActividad("Ir al teatro");
-    v5.addActividad("Ir al museo");
 
-    v6.addActividad("Ir al Mall");
     v6.addActividad("Ir a la playa");
-    v6.addActividad("Ir al zoologico");
+    v6.addActividad("Ir al Mall");
 
-    v7.addActividad("Tour de piña");
-    v7.addActividad("Campo de Girasoles");
+    v7.addActividad("Tour de la piña");
+    v7.addActividad("Campo de girasoles");  
 
-    //-------- Carga de Datos ---------
+    v8.addActividad("Ir al mirador");
+    v8.addActividad("Ir a la catarata");
+    v8.addActividad("Ir al centro civico");
 
-    // Mostrar las conexiones de cada vertice y mostrarlas
-    // showVerticeData(&v1);
-    // showVerticeData(&v2);
-    // showVerticeData(&v3);
-    // showVerticeData(&v4);
-    // showVerticeData(&v5);
-    // showVerticeData(&v6);
-    // showVerticeData(&v7);
-    // showVerticeData(&v8);
-    // showVerticeData(&v9);
-    // showVerticeData(&v10);
-    // showVerticeData(&v11);
-    // showVerticeData(&v12);
-    // showVerticeData(&v13);
+    v9.addActividad("Ir al parque");
+    v9.addActividad("Comprar arboles de navidad");
+    v9.addActividad("Ver vacas");
+
+    v10.addActividad("Ir a la gasolinera");
+
+    v11.addActividad("Ir al parque");
+
+    v12.addActividad("Ir al parque");
+
+    v13.addActividad("Ir al parque");
+    v13.addActividad("Ir a la laguna");
 
     // Add vertices to list
     listaVertices.push_back(&v1);
@@ -190,69 +187,45 @@ int main()
     int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
     cout << "\nLa ruta es: " << origenVertice->nombre + "-" + destinoVertice->nombre << "La distancia es: " << dist;
 
-    // dijkstra(origenVertice, destinoVertice);
+    string actividadEscogida = getActividad("Ir a la playa", destinoVertice);
+    cout << "\nLa actividad escogida es: " << actividadEscogida << endl;
 
-    // //-------- Menu ---------
-    // int opcion = 0;
-    // do
-    // {
-    //     cout << "Menu:" << endl;
-    //     cout << "1. Escoger un destino" << endl;
-    //     cout << "2. Salir" << endl;
-    //     cout << "Ingrese una opcion: ";
-    //     cin >> opcion;
+    // Construct Persons and add in the binary file
 
-    //     switch (opcion)
-    //     {
-    //     case 1:
-    //         cout << "Opcion 1 escogida\n"
-    //              << endl;
-    //         cout << "Ingrese el nombre del punto de origen: ";
-    //         cin >> origen;
-    //         cin.ignore();
-    //         cout << "Ingrese el nombre de la punto de destino: ";
-    //         cin >> destino;
-    //         cin.ignore();
-    //         showRutaCorta(origen, destino, listaVertices);
-    //         break;
-    //     case 2:
-    //         cout << "Opcion 2" << endl;
-    //         break;
-    //     case 3:
-    //         cout << "Saliendo..." << endl;
-    //         break;
-    //     default:
-    //         cout << "Opcion invalida" << endl;
-    //         break;
-    //     }
-    // } while (opcion != 3);
+    Persona p1(string("Masculino"), 20, &v1, &v2, string("Ir al parque"));
+    Persona p2(string("Femenino"), 30, &v3, &v5, string("Ir al parque"));
+    Persona p3(string("Masculino"), 40, &v6, &v7, string("Ir al parque"));
+    Persona p4(string("Femenino"), 50, &v8, &v9, string("Ir al parque"));
+    Persona p5(string("Masculino"), 60, &v10, &v11, string("Ir al parque"));
+    Persona p6(string("Femenino"), 70, &v12, &v13, string("Ir al parque"));
 
+    // Write in the binary file
+    ofstream file("persons.bin", ios::binary);
+    file.write(reinterpret_cast<char *>(&p1), sizeof(Persona));
+    file.write(reinterpret_cast<char *>(&p2), sizeof(Persona));
+    file.write(reinterpret_cast<char *>(&p3), sizeof(Persona));
+    file.write(reinterpret_cast<char *>(&p4), sizeof(Persona));
+    file.write(reinterpret_cast<char *>(&p5), sizeof(Persona));
+    file.write(reinterpret_cast<char *>(&p6), sizeof(Persona));
+
+    file.close();
+
+    // Read from the binary file    
+    ifstream file2("persons.bin", ios::binary);
+    Persona p = Persona("", 0, nullptr, nullptr, "");
+
+    while (file2.read(reinterpret_cast<char *>(&p), sizeof(Persona))) {
+        cout << "\n" << endl;
+        cout << "Genero:" << p.genero;
+        cout << ", Edad:" << p.edad;
+        cout << ", Origen:" << p.origen->nombre;
+        cout <<  ", Destino:" << p.destino->nombre;
+        cout << ", Actividad:" << p.actividad;
+    }
     return 0;
 }
 
-// void showVerticeData(Vertice *v)
-// {
-//     cout << "\n--------------------------------------------------------" << endl;
-//     cout << "Desde " << v->nombre << " se puede ir a: " << endl;
-//     for (auto arco : v->arcos)
-//     {
-//         cout << arco.destino->nombre << ". Distancia: " << arco.distancia << " km." << endl;
-//     }
 
-//     // Mostras actividades de cada vertice
-//     cout << "Actividades en " << v->nombre << ": " << endl;
-//     if (v->actividades.empty())
-//     {
-//         cout << "No hay actividades disponibles" << endl;
-//         return;
-//     }
-//     for (auto actividad : v->actividades)
-//     {
-//         cout << actividad << endl;
-//     }
-
-//     cout << "--------------------------------------------------------" << endl;
-// }
 int distanciaMenor = 0;
 string rutaMenor = "";
 int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
@@ -304,79 +277,16 @@ Vertice *getVertice(const string &nombre, list<Vertice *> *listaVertices)
     return nullptr;
 }
 
-// void showRutaCorta(string origen, string destino, list<Vertice> *listaVertices)
-// {
-//     // Search for the vertex with the given name
-//     Vertice *origenVertice = getVertice(origen, &listaVertices);
-//     Vertice *destinoVertice = getVertice(destino, listaVertices);
 
-//     // Calculate the distance between the two vertices
-//     calcDistancia(origenVertice, destinoVertice);
 
-//     // Show the possible activities in the destination vertex
-//     showActividaesPosibles(destino, listaVertices);
-// }
-
-// void showActividaesPosibles(string destino, list<Vertice> *listaVertices)
-// {
-//     // Search for the vertex with the given name
-//     Vertice *destinoVertice = getVertice(destino, *listaVertices);
-
-//     // Show the possible activities in the destination vertex
-//     cout << "Actividades en " << destinoVertice->nombre << ": " << endl;
-//     for (auto actividad : destinoVertice->actividades)
-//     {
-//         cout << actividad << endl;
-//     }
-// }
-
-// void dijkstra(Vertice* inicio, Vertice* destino) {
-//     // Inicializa las estructuras de datos.
-//     priority_queue<pair<int, Vertice*>> cola_prioridad;
-//     distancia_minima.clear();
-//     padre.clear();
-
-//     for (auto vertice : listaVertices) {
-//         distancia_minima[vertice] = INT_MAX;
-//         padre[vertice] = nullptr;
-//     }
-
-//     distancia_minima[inicio] = 0;
-//     cola_prioridad.push({0, inicio});
-
-//     while (!cola_prioridad.empty()) {
-//         int distancia_actual = -cola_prioridad.top().first;
-//         Vertice* vertice_actual = cola_prioridad.top().second;
-//         cola_prioridad.pop();
-
-//         // Implementa la lógica de Dijkstra para explorar los vértices adyacentes.
-
-//         for (const Arco& arco : vertice_actual->arcos) {
-//             Vertice* vecino = arco.destino;
-//             int distancia_arco = arco.distancia;
-//             int distancia_nueva = distancia_minima[vertice_actual] + distancia_arco;
-
-//             if (distancia_nueva < distancia_minima[vecino]) {
-//                 distancia_minima[vecino] = distancia_nueva;
-//                 padre[vecino] = vertice_actual;
-//                 cola_prioridad.push({-distancia_nueva, vecino});
-//             }
-//         }
-//     }
-
-//     // Reconstruye la ruta más corta desde el vértice de inicio hasta el vértice objetivo.
-//     Vertice* actual = destino;
-//     list<Vertice*> ruta_corta;
-//     while (actual != nullptr) {
-//         ruta_corta.push_front(actual);
-//         actual = padre[actual];
-//     }
-
-//     // Muestra la distancia mínima y la ruta más corta.
-//     cout << "Distancia mínima: " << distancia_minima[destino] << endl;
-//     cout << "Ruta más corta: ";
-//     for (Vertice* v : ruta_corta) {
-//         cout << v->nombre << " -> ";
-//     }
-//     cout << endl;
-// }
+string getActividad(string actividad, Vertice *destino)
+{
+    for (auto act : destino->actividades)
+    {
+        if (act == actividad)
+        {
+            return act;
+        }
+    }
+    return "No se encontro la actividad";
+}
