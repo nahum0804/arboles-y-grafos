@@ -35,15 +35,15 @@ struct Vertice {
     void removeArco(const Arco& arco);
 };
 
-struct Persona {
-    string genero;
-    int edad;
-    Vertice* origen;
-    Vertice* destino;
-    string actividad;
+// struct Persona {
+//     string genero;
+//     int edad;
+//     string origen;
+//     string destino;
+//     string actividad;
 
-    Persona(const string genero, int edad, Vertice* origen, Vertice* destino, const string actividad);
-};
+//     Persona(const string genero, int edad, string origen, string destino, const string actividad);
+// };
 
 
 struct Nodo {
