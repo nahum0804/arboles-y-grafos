@@ -46,8 +46,4 @@ struct Vertice {
 // };
 
 
-struct Nodo {
-    Nodo* siguiente;
-};
-
 #endif

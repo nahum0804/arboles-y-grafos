@@ -58,6 +58,19 @@ Persona::Persona(char genero, int edad, const char *origen1, const char *destino
     strcpy(actividad, actividad1);
     }
 
+
+struct Nodo {
+    list<Persona> lista;
+    Nodo* left;
+    Nodo* right;
+
+    Nodo(list<Persona> lista){
+        this->lista = lista;
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+};
+
 // Prototypes
 list<Vertice> listaVertices;
 void cargarDatos();
@@ -272,10 +285,159 @@ void leerArchivo(){
         file2.read(reinterpret_cast<char *>(&p), sizeof(p));
     }
 }
+
+
+//Verificar si el numero ya existe en el array
+bool insideArray(list<int> array, int num){
+    for (int i = 0; i < array.size(); i++)
+    {
+        if(array.front() == num){
+            cout << "El numero ya existe" << endl;
+            return true;    
+        }
+        array.pop_front();
+    }
+    return false;
+}
+
+
+// Crear el arbol binario en base a la lista de personas y el orden que el usuario escoga
+void createTree(list<Persona> listaPersonas) {
+    // Crear el nodo raíz con la lista de personas
+    Nodo *root = new Nodo(listaPersonas);
+
+    //Solictar el orden al usuario
+    list<int> orden;
+    int num;
+    cout << "Ingrese el orden de los datos: " << endl;
+    cout << "1. Genero" << endl;
+    cout << "2. Edad" << endl;
+    cout << "3. Origen" << endl;
+    cout << "4. Actividad" << endl;
+
+    for (int i = 0; i < 4; i++)
+    {
+        do
+        {
+            cin >> num;
+        } while (insideArray(orden, num));
+        orden.push_back(num);
+    }
+
+    list<int> ordenTmp = orden;
+    //Print order 
+    cout << "\nEl escogido orden es: " << endl;
+    for (int i = 0; i < 4; i++)
+    {
+        if (ordenTmp.front() == 1)
+            cout << i + 1 << ". Genero" << endl;
+        else if (ordenTmp.front() == 2)
+            cout << i + 1 << ". Edad" << endl;
+        else if (ordenTmp.front() == 3)
+            cout << i + 1 << ". Origen" << endl;
+        else if (ordenTmp.front() == 4)
+            cout << i + 1 << ". Actividad" << endl;
+        ordenTmp.pop_front();
+    }
+
+    for(int i = 0; i < 4; i++){
+        if(orden.front() == 1){
+            //Ordenar por genero
+            list<Persona> listaHombres;
+            list<Persona> listaMujeres;
+            list<Persona> listaTmp = root->lista;
+            while (!listaTmp.empty())
+            {
+                if(listaTmp.front().genero == 'M')
+                    listaHombres.push_back(listaTmp.front());
+                else
+                    listaMujeres.push_back(listaTmp.front());
+                listaTmp.pop_front();
+            }
+            //Crear nodos hijos
+            Nodo *hijo1 = new Nodo(listaHombres);
+            Nodo *hijo2 = new Nodo(listaMujeres);
+            root->left = hijo1;
+            root->right = hijo2;
+        } 
+        else if(orden.front() == 2){
+            //Ordenar por edad
+            list<Persona> lista18_30;
+            list<Persona> lista31_64;
+            list<Persona> lista65;
+
+            list<Persona> listaTmp = root->lista;
+            while (!listaTmp.empty())
+            {
+                if(listaTmp.front().edad >= 18 && listaTmp.front().edad <= 30)
+                    lista18_30.push_back(listaTmp.front());
+                else if(listaTmp.front().edad >= 31 && listaTmp.front().edad <= 64)
+                    lista31_64.push_back(listaTmp.front());
+                else
+                    lista65.push_back(listaTmp.front());
+                listaTmp.pop_front();
+            }
+
+            //Crear nodos hijos
+            Nodo *hijo1 = new Nodo(lista18_30);
+            Nodo *hijo2 = new Nodo(lista31_64);
+            Nodo *hijo3 = new Nodo(lista65);
+            root->left = hijo1;
+            root->right = hijo2;
+            hijo2->right = hijo3;
+        }
+        else if(orden.front() == 3){
+
+        }
+        else if(orden.front() == 4){
+
+        }
+    }
+
+    //Mostrar el arbol por niveles
+    cout << "\n\nMostrando el arbol por niveles: " << endl;
+    queue<Nodo*> cola;
+    cola.push(root);
+    while (!cola.empty())
+    {
+        Nodo *tmp = cola.front();
+        cola.pop();
+        cout << "\nNodo: " << endl;
+        list<Persona> listaTmp = tmp->lista;
+        while (!listaTmp.empty())
+        {
+            cout << listaTmp.front().genero << " " << listaTmp.front().edad << " " << listaTmp.front().origen << " " << listaTmp.front().destino << " " << listaTmp.front().actividad << endl;
+            listaTmp.pop_front();
+        }
+        if(tmp->left != nullptr)
+            cola.push(tmp->left);
+        if(tmp->right != nullptr)
+            cola.push(tmp->right);
+    }
+}
+
+//Crear arreglo con los datos de las personas para el arbol
+void displayTree(){
+    fstream file2("persons.bin", ios::in | ios::out |ios::binary );
+    Persona p = Persona('z', 0, "", "", "");
+    file2.read(reinterpret_cast<char *>(&p), sizeof(Persona));
+    //Lista de personas
+    list<Persona> listaPersonas;
+
+    while (!file2.eof()) {
+        listaPersonas.push_back(p);
+        file2.read(reinterpret_cast<char *>(&p), sizeof(p));
+    }
+
+    createTree(listaPersonas);
+}
+
+// Menu
 void menu(){
     cout<<"\n1. Leer archivo";
     cout<<"\n2. Ruta corta";
     cout<<"\n3. Mostrar vertices";
+    cout << "\n4. Consultar Personas";
     cout<<"\n0. Salir \n";
 }
 
@@ -286,7 +448,8 @@ int main()
 
     //list<string> actividades = {"Shopping", "Ir al parque", "Ir al Mall", "Termales", "Senderismo", "Canopy", "Observación de aves", "Serpentario", "Ir al Rio", "Ir al Museo", "Ir al Teatro", "Ir a la playa", "Tour dela_piña", "Campo_de_girasoles", "Ir_al_mirador", "Ir_a_la_catarata", "Ir_al_centro_civico", "Ir_al_parque", "Comprar_arboles_de_navidad", "Ver_vacas", "Ir_a_la_gasolinera"};
 
-    cargarDatos();
+    cargarDatos(); //Carga de datos
+
     int opcion;
     while(true){
         menu();
@@ -332,12 +495,17 @@ int main()
 
 
         }
+        else if (opcion == 4)
+        {
+            cout << "Desplegando valores con el arbol binario: \n \n";
+            displayTree();
+        }
 
     }
     return 0;
 }
 
-
+// Funcion para calcular la distancia mas corta (Retorna la distancia mas corta entre dos ciudades como un entero)
 int distanciaMenor = 0;
 string rutaMenor = "";
 int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
@@ -370,6 +538,7 @@ int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
     return distanciaMenor;
 }
 
+// Funcion para obtener los vertices de una lista
 void getListaVertices(list<Vertice> listaVertices)
 {
     cout << endl;
@@ -380,6 +549,7 @@ void getListaVertices(list<Vertice> listaVertices)
     }
 }
 
+// Funcion para obtener un vertice especifico en base al nombre dentro de una lista
 Vertice getVertice(const string &nombre, list<Vertice> listaVertices)
 {
     for (auto vertice : listaVertices)
@@ -395,7 +565,7 @@ Vertice getVertice(const string &nombre, list<Vertice> listaVertices)
 }
 
 
-
+// Obtener la actividad de un vertice
 string getActividad(string actividad, Vertice *destino)
 {
     for (auto act : destino->actividades)
