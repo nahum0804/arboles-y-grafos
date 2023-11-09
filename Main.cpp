@@ -39,32 +39,33 @@ void Vertice::addArco(int distancia, Vertice *destino)
     destino->arcos.push_back({distancia, this});
 }
 
-
-struct Persona {
+struct Persona
+{
     char genero;
     int edad;
-    char origen[15] ;
-    char  destino[15];
-    char  actividad[30];
+    char origen[15];
+    char destino[15];
+    char actividad[30];
 
-    Persona( char genero, int edad, const char* origen,const char *destino, char* actividad);
+    Persona(char genero, int edad, const char *origen, const char *destino, char *actividad);
 };
 
-Persona::Persona(char genero, int edad, const char *origen1, const char *destino1, char *actividad1) :
-    genero(genero), edad(edad) {
+Persona::Persona(char genero, int edad, const char *origen1, const char *destino1, char *actividad1) : genero(genero), edad(edad)
+{
 
     strcpy(origen, origen1);
     strcpy(destino, destino1);
     strcpy(actividad, actividad1);
-    }
+}
 
-
-struct Nodo {
+struct Nodo
+{
     list<Persona> lista;
-    Nodo* left;
-    Nodo* right;
+    Nodo *left;
+    Nodo *right;
 
-    Nodo(list<Persona> lista){
+    Nodo(list<Persona> lista)
+    {
         this->lista = lista;
         this->left = nullptr;
         this->right = nullptr;
@@ -73,32 +74,34 @@ struct Nodo {
 
 // Prototypes
 list<Vertice> listaVertices;
+list<string> listaActividades;
 void cargarDatos();
 void registrarActividades();
 
 void showVerticeData(Vertice *vertice);
 int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis);
 
-void createVertice(string nombre);
-void deleteVertice(string nombre);
-void modificarVertice(string nombre);
+void createVertice(list<Vertice> &vertices, const string nombreV);
+void deleteVertice(list<Vertice> &vertices, const Vertice &vertice);
+void modificarVertice(Vertice &vertice, const string &nuevoNombre);
 
 void createArco(string origen, string destino);
-void deleteArco(string origen, string destino);
-void modificarArco(string origen, string destino);
+void deleteArco(Vertice &vertice, const string &nombreDestino);
+void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
 
 void showRutaCorta(string origen, string destino, Vertice *listaVertices);
 void showActividaesPosibles(string destino, Vertice *listaVertices);
 string getActividad(string actividad, Vertice *listaVertices);
 
 void getListaVertices(list<Vertice> listaVertices);
-Vertice getVertice(const string &nombre, list<Vertice > listaVertices);
+Vertice getVertice(const string &nombre, list<Vertice> listaVertices);
 
 void dijkstra(Vertice *inicio, Vertice *destino);
 
-void cargarDatos(){
-//-------- Carga de Datos ---------
+void getListaActividades(list<string> listaActividades);
 
+void cargarDatos()
+{
     // Creación de vértices
     Vertice v1("Ciudad_Quesada");
     Vertice v2("La_Fortuna");
@@ -140,36 +143,61 @@ void cargarDatos(){
 
     // Agregando actividades
     v1.addActividad("Shopping");
+    listaActividades.push_back("Shopping");
     v1.addActividad("Ir al parque");
+    listaActividades.push_back("Ir al parque");
     v1.addActividad("Ir al Mall");
+    listaActividades.push_back("Ir al Mall");
 
     v2.addActividad("Termales");
+    listaActividades.push_back("Termales");
     v2.addActividad("Senderismo");
+    listaActividades.push_back("Senderismo");
     v2.addActividad("Canopy");
+    listaActividades.push_back("Canopy");
     v2.addActividad("Observación de aves");
+    listaActividades.push_back("Observacion de aves");
     v2.addActividad("Serpentario");
+    listaActividades.push_back("Serpentario");
 
-    v3.addActividad("Ir al Rio");
+    v3.addActividad("Senderismo");
+    v3.addActividad("Observación de aves");
 
-    v5.addActividad("Ir al Museo");
-    v5.addActividad("Ir al Teatro");
     v5.addActividad("Ir al Mall");
+    v5.addActividad("Ir al parque");
+    v5.addActividad("Ir al cine");
+    listaActividades.push_back("Ir al cine");
+    v5.addActividad("Ir al teatro");
+    listaActividades.push_back("Ir al teatro");
+    v5.addActividad("Ir al museo");
+    listaActividades.push_back("Ir al museo");
 
-    v6.addActividad("Ir a la playa");
     v6.addActividad("Ir al Mall");
+    v6.addActividad("Ir a la playa");
+    listaActividades.push_back("Ir a la playa");
+    v6.addActividad("Ir al zoologico");
+    listaActividades.push_back("Ir al zoologico");
 
-    v7.addActividad("Tour de la piña");
-    v7.addActividad("Campo de girasoles");
+    v7.addActividad("Tour de piña");
+    listaActividades.push_back("Tour de piña");
+    v7.addActividad("Campo de Girasoles");
+    listaActividades.push_back("Campo de girasoles");
 
     v8.addActividad("Ir al mirador");
+    listaActividades.push_back("Ir al mirador");
     v8.addActividad("Ir a la catarata");
+    listaActividades.push_back("Ir a la catarata");
     v8.addActividad("Ir al centro civico");
+    listaActividades.push_back("Ir al centro civico");
 
     v9.addActividad("Ir al parque");
     v9.addActividad("Comprar arboles de navidad");
+    listaActividades.push_back("Comprar arboles de navidad");
     v9.addActividad("Ver vacas");
+    listaActividades.push_back("Ver vacas");
 
     v10.addActividad("Ir a la gasolinera");
+    listaActividades.push_back("Ir a la gasolinera");
 
     v11.addActividad("Ir al parque");
 
@@ -177,6 +205,7 @@ void cargarDatos(){
 
     v13.addActividad("Ir al parque");
     v13.addActividad("Ir a la laguna");
+    listaActividades.push_back("Ir a la laguna");
 
     // Add vertices to list
     listaVertices.push_back(v1);
@@ -192,7 +221,7 @@ void cargarDatos(){
     listaVertices.push_back(v12);
     listaVertices.push_back(v13);
 
-// Construct Persons and add in the binary file
+    // Construct Persons and add in the binary file
 
     Persona p1('M', 20, "Ciudad_Quesada", "La_Fortuna", "Ir al parque");
     Persona p2('F', 30, (v3.nombre.c_str()), (v5.nombre.c_str()), "Ir al parque");
@@ -227,7 +256,7 @@ void cargarDatos(){
 
     // Write in the binary file
 
-    fstream file("persons.bin", ios::in | ios::out |ios::binary |ios::trunc );
+    fstream file("persons.bin", ios::in | ios::out | ios::binary | ios::trunc);
 
     file.write(reinterpret_cast<char *>(&p1), sizeof(Persona));
     file.write(reinterpret_cast<char *>(&p2), sizeof(Persona));
@@ -263,50 +292,54 @@ void cargarDatos(){
     file.close();
 }
 
-void leerArchivo(){
- // Read from the binary file
-   // ifstream file2("persons.bin", ios::binary);
-    fstream file2("persons.bin", ios::in | ios::out |ios::binary );
-//
+void leerArchivo()
+{
+    // Read from the binary file
+    // ifstream file2("persons.bin", ios::binary);
+    fstream file2("persons.bin", ios::in | ios::out | ios::binary);
+    //
     Persona p = Persona('z', 0, "", "", "");
     file2.read(reinterpret_cast<char *>(&p), sizeof(Persona));
 
-    while (!file2.eof()) {
-        cout << "\n" << endl;
-        if(p.genero == 'M')
+    while (!file2.eof())
+    {
+        cout << "\n"
+             << endl;
+        if (p.genero == 'M')
             cout << "hombre de ";
         else
             cout << "mujer de";
 
         cout << " " << p.edad;
         cout << " años está en " << p.origen;
-        cout <<  " y quiere viajar a " << p.destino;
+        cout << " y quiere viajar a " << p.destino;
         cout << " para " << p.actividad;
         file2.read(reinterpret_cast<char *>(&p), sizeof(p));
     }
 }
 
-
-//Verificar si el numero ya existe en el array
-bool insideArray(list<int> array, int num){
+// Verificar si el numero ya existe en el array
+bool insideArray(list<int> array, int num)
+{
     for (int i = 0; i < array.size(); i++)
     {
-        if(array.front() == num){
+        if (array.front() == num)
+        {
             cout << "El numero ya existe" << endl;
-            return true;    
+            return true;
         }
         array.pop_front();
     }
     return false;
 }
 
-
 // Crear el arbol binario en base a la lista de personas y el orden que el usuario escoga
-void createTree(list<Persona> listaPersonas) {
+void createTree(list<Persona> listaPersonas)
+{
     // Crear el nodo raíz con la lista de personas
     Nodo *root = new Nodo(listaPersonas);
 
-    //Solictar el orden al usuario
+    // Solictar el orden al usuario
     list<int> orden;
     int num;
     cout << "Ingrese el orden de los datos: " << endl;
@@ -325,7 +358,7 @@ void createTree(list<Persona> listaPersonas) {
     }
 
     list<int> ordenTmp = orden;
-    //Print order 
+    // Print order
     cout << "\nEl escogido orden es: " << endl;
     for (int i = 0; i < 4; i++)
     {
@@ -340,28 +373,31 @@ void createTree(list<Persona> listaPersonas) {
         ordenTmp.pop_front();
     }
 
-    for(int i = 0; i < 4; i++){
-        if(orden.front() == 1){
-            //Ordenar por genero
+    for (int i = 0; i < 4; i++)
+    {
+        if (orden.front() == 1)
+        {
+            // Ordenar por genero
             list<Persona> listaHombres;
             list<Persona> listaMujeres;
             list<Persona> listaTmp = root->lista;
             while (!listaTmp.empty())
             {
-                if(listaTmp.front().genero == 'M')
+                if (listaTmp.front().genero == 'M')
                     listaHombres.push_back(listaTmp.front());
                 else
                     listaMujeres.push_back(listaTmp.front());
                 listaTmp.pop_front();
             }
-            //Crear nodos hijos
+            // Crear nodos hijos
             Nodo *hijo1 = new Nodo(listaHombres);
             Nodo *hijo2 = new Nodo(listaMujeres);
             root->left = hijo1;
             root->right = hijo2;
-        } 
-        else if(orden.front() == 2){
-            //Ordenar por edad
+        }
+        else if (orden.front() == 2)
+        {
+            // Ordenar por edad
             list<Persona> lista18_30;
             list<Persona> lista31_64;
             list<Persona> lista65;
@@ -369,16 +405,16 @@ void createTree(list<Persona> listaPersonas) {
             list<Persona> listaTmp = root->lista;
             while (!listaTmp.empty())
             {
-                if(listaTmp.front().edad >= 18 && listaTmp.front().edad <= 30)
+                if (listaTmp.front().edad >= 18 && listaTmp.front().edad <= 30)
                     lista18_30.push_back(listaTmp.front());
-                else if(listaTmp.front().edad >= 31 && listaTmp.front().edad <= 64)
+                else if (listaTmp.front().edad >= 31 && listaTmp.front().edad <= 64)
                     lista31_64.push_back(listaTmp.front());
                 else
                     lista65.push_back(listaTmp.front());
                 listaTmp.pop_front();
             }
 
-            //Crear nodos hijos
+            // Crear nodos hijos
             Nodo *hijo1 = new Nodo(lista18_30);
             Nodo *hijo2 = new Nodo(lista31_64);
             Nodo *hijo3 = new Nodo(lista65);
@@ -386,17 +422,17 @@ void createTree(list<Persona> listaPersonas) {
             root->right = hijo2;
             hijo2->right = hijo3;
         }
-        else if(orden.front() == 3){
-
+        else if (orden.front() == 3)
+        {
         }
-        else if(orden.front() == 4){
-
+        else if (orden.front() == 4)
+        {
         }
     }
 
-    //Mostrar el arbol por niveles
+    // Mostrar el arbol por niveles
     cout << "\n\nMostrando el arbol por niveles: " << endl;
-    queue<Nodo*> cola;
+    queue<Nodo *> cola;
     cola.push(root);
     while (!cola.empty())
     {
@@ -409,114 +445,259 @@ void createTree(list<Persona> listaPersonas) {
             cout << listaTmp.front().genero << " " << listaTmp.front().edad << " " << listaTmp.front().origen << " " << listaTmp.front().destino << " " << listaTmp.front().actividad << endl;
             listaTmp.pop_front();
         }
-        if(tmp->left != nullptr)
+        if (tmp->left != nullptr)
             cola.push(tmp->left);
-        if(tmp->right != nullptr)
+        if (tmp->right != nullptr)
             cola.push(tmp->right);
     }
 }
 
-//Crear arreglo con los datos de las personas para el arbol
-void displayTree(){
-    fstream file2("persons.bin", ios::in | ios::out |ios::binary );
+// Crear arreglo con los datos de las personas para el arbol
+void displayTree()
+{
+    fstream file2("persons.bin", ios::in | ios::out | ios::binary);
     Persona p = Persona('z', 0, "", "", "");
     file2.read(reinterpret_cast<char *>(&p), sizeof(Persona));
-    //Lista de personas
+    // Lista de personas
     list<Persona> listaPersonas;
 
-    while (!file2.eof()) {
+    while (!file2.eof())
+    {
         listaPersonas.push_back(p);
         file2.read(reinterpret_cast<char *>(&p), sizeof(p));
     }
 
     createTree(listaPersonas);
 }
+int totalH, totalM, porcH, porcM, cantH, cantM;
+void calcPorcentaje(Vertice vertice)
+{
+    fstream file2("persons.bin", ios::in | ios::out | ios::binary);
+    Persona p = Persona('z', 0, "", "", "");
+    file2.read(reinterpret_cast<char *>(&p), sizeof(Persona));
+    // Lista de personas
+    list<Persona> listaPersonas;
+
+    while (!file2.eof())
+    {
+        listaPersonas.push_back(p);
+        file2.read(reinterpret_cast<char *>(&p), sizeof(p));
+    }
+
+    Nodo *raiz = new Nodo(listaPersonas);
+    list<Persona> listaHombres;
+    list<Persona> listaMujeres;
+    list<Persona> listaTmp = raiz->lista;
+    while (!listaTmp.empty())
+    {
+        if (listaTmp.front().genero == 'M')
+            listaHombres.push_back(listaTmp.front());
+        else
+            listaMujeres.push_back(listaTmp.front());
+        listaTmp.pop_front();
+    }
+
+    for (auto hombre : listaHombres)
+    {
+        totalH++;
+        cout << totalH;
+        cout << hombre.origen << endl;
+        if (string(hombre.origen) == vertice.nombre)
+        {
+            cout << "ojitooo->" << hombre.origen << endl;
+            cantH++;
+            cout << cantH;
+        }
+    }
+
+    for (auto mujer : listaMujeres)
+    {
+        totalM++;
+        cout << totalM;
+        cout << mujer.origen << endl;
+        if (string(mujer.origen) == vertice.nombre)
+        {
+            cout << "ojitooo->" << mujer.origen << endl;
+            cantM++;
+            cout << cantM;
+        }
+    }
+    porcH = (cantH * 100) / totalH;
+    porcM = (cantM * 100) / totalM;
+
+    cout << vertice.nombre << ":\nPorcentaje de mujeres: " << porcM << endl;
+    cout << "Porcentaje de hombres: " << porcH << endl;
+}
 
 // Menu
-void menu(){
-    cout<<"\n1. Leer archivo";
-    cout<<"\n2. Ruta corta";
-    cout<<"\n3. Mostrar vertices";
+void menu()
+{
+    cout << "\n1. Leer archivo";
+    cout << "\n2. Ruta corta";
+    cout << "\n3. Mostrar vertices";
     cout << "\n4. Consultar Personas";
-    cout<<"\n0. Salir \n";
+    cout << "\n5. Añadir Ciudad";
+    cout << "\n6. Modificar Ciudad";
+    cout << "\n7. Eliminar Ciudad";
+    cout << "\n8. Crear ruta";
+    cout << "\n9. Modificar ruta";
+    cout << "\n10. Eliminar ruta";
+    cout << "\n0. Salir \n";
 }
 
 int main()
 {
     string origen, destino;
 
+    cargarDatos();
 
-    //list<string> actividades = {"Shopping", "Ir al parque", "Ir al Mall", "Termales", "Senderismo", "Canopy", "Observación de aves", "Serpentario", "Ir al Rio", "Ir al Museo", "Ir al Teatro", "Ir a la playa", "Tour dela_piña", "Campo_de_girasoles", "Ir_al_mirador", "Ir_a_la_catarata", "Ir_al_centro_civico", "Ir_al_parque", "Comprar_arboles_de_navidad", "Ver_vacas", "Ir_a_la_gasolinera"};
-
-    cargarDatos(); //Carga de datos
+    getListaActividades(listaActividades);
 
     int opcion;
-    while(true){
+    while (true)
+    {
         menu();
-        cin>>opcion;
+        cin >> opcion;
 
-        if(opcion == 1){
+        if (opcion == 1)
+        {
             leerArchivo();
-            cout<<"\n \nArchivo leido \n \n";
+            cout << "\n \nArchivo leido \n \n";
+            Vertice x = getVertice("La_Fortuna", listaVertices);
+            calcPorcentaje(x);
         }
-        else if(opcion==0)
+        else if (opcion == 0)
             break;
-        else if(opcion == 3)
-              // Show lista
-                getListaVertices(listaVertices);
-        else if(opcion == 2){
+        else if (opcion == 3)
+            // Show lista
+            getListaVertices(listaVertices);
+        else if (opcion == 2)
+        {
 
-                    //string ciudad1, ciudad2;
-                    cout << "Ingrese el nombre de la ciudad de partida: ";
-                    cin >> origen;
-                    cin.ignore();
+            cout << "Ingrese el nombre de la ciudad de partida: ";
+            cin >> origen;
+            cin.ignore();
 
-                    cout << "Ingrese el nombre de la ciudad de destino: ";
-                    cin >> destino;
-                    cin.ignore();
+            cout << "Ingrese el nombre de la ciudad de destino: ";
+            cin >> destino;
+            cin.ignore();
 
+            Vertice origenVertice = getVertice(origen, listaVertices);
+            Vertice destinoVertice = getVertice(destino, listaVertices);
 
-                // Show ciudades selected
-                cout << "Ciudad de partida: " << origen << endl;
-                cout << "Ciudad de destino: " << destino << endl;
+            cout << "Ciudad de partida: " << origenVertice.nombre << endl;
+            cout << "Ciudad de destino: " << destinoVertice.nombre << endl;
 
-                Vertice origenVertice = getVertice(origen, listaVertices);
-                Vertice destinoVertice = getVertice(destino, listaVertices);
-
-                cout << "Ciudad de partida: " << origenVertice.nombre << endl;
-                cout << "Ciudad de destino: " << destinoVertice.nombre << endl;
-
-                int dist = calcDistancia(&origenVertice, &destinoVertice, " ", 0);
-                cout << "\nLa ruta es: " << origen + "-" + destino << ". La distancia es: " << dist;
-
-//                string actividadEscogida = getActividad("Ir a la playa", destinoVertice);
-//                cout << "\nLa actividad escogida es: " << actividadEscogida << endl;
-
-
-
+            int dist = calcDistancia(&origenVertice, &destinoVertice, " ", 0);
+            cout << "\nLa ruta es: " << origen + "-" + destino << "La distancia es: " << dist;
         }
         else if (opcion == 4)
         {
             cout << "Desplegando valores con el arbol binario: \n \n";
             displayTree();
         }
-
+        else if (opcion == 5)
+        {
+            string nombreVertice;
+            cout << "\nIngrese el nombre de la nueva ciudad: ";
+            cin >> nombreVertice;
+            cin.ignore();
+            createVertice(listaVertices, nombreVertice);
+        }
+        else if (opcion == 6)
+        {
+            string nombreVertice, nuevoNombre;
+            cout << "\nIngrese el nombre de la ciudad: ";
+            cin >> nombreVertice;
+            cin.ignore();
+            Vertice modVertice = getVertice(nombreVertice, listaVertices);
+            if (modVertice.nombre == nombreVertice)
+            {
+                cout << "\nIngrese el nuevo nombre para la ciudad: ";
+                cin >> nuevoNombre;
+                cin.ignore();
+                modificarVertice(modVertice, nuevoNombre);
+            }
+            else
+            {
+                cout << "El vértice no se encontró en la lista." << endl;
+            }
+        }
+        else if (opcion == 7)
+        {
+            string nombreVertice;
+            cout << "\nIngrese el nombre de la ciudad: ";
+            cin >> nombreVertice;
+            cin.ignore();
+            Vertice dVertice = getVertice(nombreVertice, listaVertices);
+            deleteVertice(listaVertices, dVertice);
+        }
+        else if (opcion == 8)
+        {
+            string nOrigen, nDestino;
+            int dist;
+            cout << "\nIngrese el nombre de la ciudad de origen: ";
+            cin >> nOrigen;
+            cin.ignore();
+            Vertice origenVertice = getVertice(nOrigen, listaVertices);
+            cout << "\nIngrese el nombre de la ciudad destino: ";
+            cin >> nDestino;
+            cin.ignore();
+            Vertice destinoVertice = getVertice(nDestino, listaVertices);
+            cout << "\nDigite la distancia entre el origen y el destino: ";
+            cin >> dist;
+            cin.ignore();
+            origenVertice.addArco(dist, &destinoVertice);
+        }
+        else if (opcion == 9)
+        {
+            string nOrigen, nDestino, nuevoDestino;
+            int nDist;
+            cout << "\nIngrese el nombre de la ciudad de origen: ";
+            cin >> nOrigen;
+            cin.ignore();
+            Vertice origenVertice = getVertice(nOrigen, listaVertices);
+            cout << "\nIngrese el nombre de la ciudad destino: ";
+            cin >> nDestino;
+            cin.ignore();
+            cout << "\nIngrese el nombre de la nueva ciudad de destino: ";
+            cin >> nuevoDestino;
+            cin.ignore();
+            Vertice destinoArco = getVertice(nOrigen, listaVertices);
+            cout << "\nIngrese la distancia de la ruta: ";
+            cin >> nDist;
+            cin.ignore();
+            modificarArco(origenVertice, nDestino, nDist, destinoArco);
+        }
+        else if (opcion == 10)
+        {
+            string origenArco, nDestino;
+            cout << "\nIngrese el nombre de la ciudad de origen: ";
+            cin >> origenArco;
+            cin.ignore();
+            Vertice origenVertice = getVertice(origenArco, listaVertices);
+            cout << "\nIngrese el nombre de la ciudad destino: ";
+            cin >> nDestino;
+            cin.ignore();
+            deleteArco(origenVertice, nDestino);
+        }
     }
+
     return 0;
 }
 
-// Funcion para calcular la distancia mas corta (Retorna la distancia mas corta entre dos ciudades como un entero)
+// Funcion para calcular la distancia mas corta(retorna la distancia mas corta entre dos ciudades como un entero)
 int distanciaMenor = 0;
 string rutaMenor = "";
 int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
 {
-    cout << "\nOrigen: " << origen->nombre << " Destino: " << destino->nombre << " Ruta: " << ruta << " Distancia: " << dis;
+    cout << "\nOrigen: " << origen->nombre << "Destino: " << destino->nombre << "Ruta: " << ruta << "Distancia: " << dis;
     if ((origen == NULL) or (origen->visitado == true))
         return 0;
 
     if (origen->nombre == destino->nombre)
     {
-        cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << " La distancia es: " << dis;
+        cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << "La distancia es" << dis;
         if ((distanciaMenor == 0) || (dis < distanciaMenor))
         {
             distanciaMenor = dis;
@@ -529,7 +710,7 @@ int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
     list<Arco>::iterator tempA = origen->arcos.begin();
     while (tempA != origen->arcos.end())
     {
-        cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << " La distancia es: " << dis << " - Dentro del while" << endl;
+        //cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << " La distancia es: " << dis << " - Dentro del while" << endl;
         calcDistancia(tempA->destino, destino, ruta + origen->nombre, dis + tempA->distancia);
         cout << "Salió" << endl;
         tempA++;
@@ -538,32 +719,48 @@ int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
     return distanciaMenor;
 }
 
-// Funcion para obtener los vertices de una lista
 void getListaVertices(list<Vertice> listaVertices)
 {
     cout << endl;
     for (auto vertice : listaVertices)
     {
-       // cout << vertice << endl;
         cout << vertice.nombre << endl;
     }
 }
 
-// Funcion para obtener un vertice especifico en base al nombre dentro de una lista
+void getListaActividades(list<string> listaActividades)
+{
+    cout << endl;
+    for (auto actividad : listaActividades)
+    {
+        cout << actividad << endl;
+    }
+}
+
 Vertice getVertice(const string &nombre, list<Vertice> listaVertices)
 {
     for (auto vertice : listaVertices)
     {
         if (vertice.nombre == nombre)
         {
-//            cout << vertice << endl;
             return vertice;
         }
     }
     cout << "No se encontro el vertice" << endl;
-//    return vertice;
 }
 
+Arco *getArco(Vertice &vertice, const string &nombreDestino)
+{
+    for (Arco &arco : vertice.arcos)
+    {
+        if (arco.destino->nombre == nombreDestino)
+        {
+            return &arco;
+        }
+    }
+    cout << "\nNo se encontró la ruta";
+    return nullptr; // El arco no se encontró
+}
 
 // Obtener la actividad de un vertice
 string getActividad(string actividad, Vertice *destino)
@@ -576,4 +773,55 @@ string getActividad(string actividad, Vertice *destino)
         }
     }
     return "No se encontro la actividad";
+}
+
+// Función para agregar un vértice a una lista de vértices
+void createVertice(list<Vertice> &vertices, const string nombreV)
+{
+    Vertice nuevoVertice(nombreV);
+    vertices.push_back(nuevoVertice);
+}
+
+// Funcion para modificar vertices
+void modificarVertice(Vertice &vertice, const string &nuevoNombre)
+{
+    vertice.nombre = nuevoNombre;
+}
+
+// Función para eliminar un vértice de una lista de vértices
+void deleteVertice(list<Vertice> &vertices, const Vertice &vertice)
+{
+    // vertices.remove(vertice);
+    cout << "Eliminaria el vertice " << vertice.nombre << endl;
+}
+
+// Función para modificar un arco
+void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino)
+{
+    Arco *arco = getArco(vertice, nombreDestino);
+    if (arco)
+    {
+        arco->distancia = nuevaDistancia;
+        arco->destino = &nuevoDestino;
+        cout << "Ruta modificada con éxito." << endl;
+    }
+    else
+    {
+        cout << "Ruta no encontrada." << endl;
+    }
+}
+
+// Función para eliminar un arco
+void deleteArco(Vertice &vertice, const string &nombreDestino)
+{
+    Arco *arco = getArco(vertice, nombreDestino);
+    if (arco)
+    {
+        //vertice.arcos.remove(*arco);
+        cout << "Eliminaria el arco de " << vertice.nombre << " hasta " << nombreDestino << endl;
+    }
+    else
+    {
+        cout << "Arco no encontrado." << endl;
+    }
 }
