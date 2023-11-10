@@ -11,22 +11,22 @@
 
 using namespace std;
 
-Arco::Arco(int dist, Vertice *dest) : distancia(dist), destino(dest) {}
+Arco::Arco(int dist, Vertice dest) : distancia(dist), destino(dest) {}
 
 // Implementación del constructor de Vertice
-Vertice::Vertice(const string &nombre) : nombre(nombre) {}
+Vertice::Vertice(const string nombre) : nombre(nombre) {}
 
 // Implementación de la función para agregar actividades
-void Vertice::addActividad(const string &actividad)
+void Vertice::addActividad(const string actividad)
 {
     actividades.push_back(actividad);
 }
 
 // Implementación de la función para agregar arcos
-void Vertice::addArco(int distancia, Vertice *destino)
+void Vertice::addArco(int distancia, Vertice destino)
 {
     // Verificar si el arco ya existe en el vector de arcos
-    for (const Arco &arco : arcos)
+    for (const Arco arco : arcos)
     {
         if (arco.destino == destino)
         {
@@ -36,7 +36,7 @@ void Vertice::addArco(int distancia, Vertice *destino)
     }
     // Agregar el arco si no existe
     arcos.push_back({distancia, destino});
-    destino->arcos.push_back({distancia, this});
+    destino.arcos.push_back({distancia, this});
 }
 
 struct Persona
@@ -47,10 +47,10 @@ struct Persona
     char destino[15];
     char actividad[30];
 
-    Persona(char genero, int edad, const char *origen, const char *destino, char *actividad);
+    Persona(char genero, int edad, const char origen, const char destino, char actividad);
 };
 
-Persona::Persona(char genero, int edad, const char *origen1, const char *destino1, char *actividad1) : genero(genero), edad(edad)
+Persona::Persona(char genero, int edad, const char origen1, const char destino1, char actividad1) : genero(genero), edad(edad)
 {
 
     strcpy(origen, origen1);
@@ -78,25 +78,25 @@ list<string> listaActividades;
 void cargarDatos();
 void registrarActividades();
 
-void showVerticeData(Vertice *vertice);
-int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis);
+void showVerticeData(Vertice vertice);
+int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis);
 
-void createVertice(list<Vertice> &vertices, const string nombreV);
-void deleteVertice(list<Vertice> &vertices, const Vertice &vertice);
-void modificarVertice(Vertice &vertice, const string &nuevoNombre);
+void createVertice(list<Vertice> vertices, const string nombreV);
+void deleteVertice(list<Vertice> vertices, const Vertice vertice);
+void modificarVertice(Vertice vertice, const string nuevoNombre);
 
 void createArco(string origen, string destino);
-void deleteArco(Vertice &vertice, const string &nombreDestino);
-void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
+void deleteArco(Vertice vertice, const string nombreDestino);
+void modificarArco(Vertice vertice, const string nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
 
-void showRutaCorta(string origen, string destino, Vertice *listaVertices);
-void showActividaesPosibles(string destino, Vertice *listaVertices);
-string getActividad(string actividad, Vertice *listaVertices);
+void showRutaCorta(string origen, string destino, Vertice listaVertices);
+void showActividaesPosibles(string destino, Vertice listaVertices);
+string getActividad(string actividad, Vertice listaVertices);
 
 void getListaVertices(list<Vertice> listaVertices);
-Vertice getVertice(const string &nombre, list<Vertice> listaVertices);
+Vertice getVertice(const string nombre, list<Vertice> listaVertices);
 
-void dijkstra(Vertice *inicio, Vertice *destino);
+//void dijkstra(Vertice inicio, Vertice destino);
 
 void getListaActividades(list<string> listaActividades);
 
@@ -117,29 +117,29 @@ void cargarDatos()
     Vertice v13("Rio_Cuarto");
 
     // Conexiones entre vértices (arcos)
-    v1.addArco(15, &v3);
-    v1.addArco(25, &v8);
-    v1.addArco(40, &v9);
+    v1.addArco(15, v3);
+    v1.addArco(25, v8);
+    v1.addArco(40, v9);
 
-    v3.addArco(10, &v11);
-    v3.addArco(35, &v2);
+    v3.addArco(10, v11);
+    v3.addArco(35, v2);
 
-    v6.addArco(110, &v2);
+    v6.addArco(110, v2);
 
-    v8.addArco(15, &v7);
-    v8.addArco(10, &v12);
+    v8.addArco(15, v7);
+    v8.addArco(10, v12);
 
-    v9.addArco(90, &v5);
+    v9.addArco(90, v5);
 
-    v10.addArco(30, &v2);
-    v10.addArco(15, &v11);
-    v10.addArco(25, &v7);
+    v10.addArco(30, v2);
+    v10.addArco(15, v11);
+    v10.addArco(25, v7);
 
-    v12.addArco(20, &v7);
+    v12.addArco(20, v7);
 
-    v13.addArco(30, &v12);
-    v13.addArco(50, &v7);
-    v13.addArco(110, &v5);
+    v13.addArco(30, v12);
+    v13.addArco(50, v7);
+    v13.addArco(110, v5);
 
     // Agregando actividades
     v1.addActividad("Shopping");
@@ -588,7 +588,7 @@ int main()
             cout << "Ciudad de partida: " << origenVertice.nombre << endl;
             cout << "Ciudad de destino: " << destinoVertice.nombre << endl;
 
-            int dist = calcDistancia(&origenVertice, &destinoVertice, " ", 0);
+            int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
             cout << "\nLa ruta es: " << origen + "-" + destino << "La distancia es: " << dist;
         }
         else if (opcion == 4)
@@ -647,7 +647,7 @@ int main()
             cout << "\nDigite la distancia entre el origen y el destino: ";
             cin >> dist;
             cin.ignore();
-            origenVertice.addArco(dist, &destinoVertice);
+            origenVertice.addArco(dist, destinoVertice);
         }
         else if (opcion == 9)
         {
@@ -689,10 +689,10 @@ int main()
 // Funcion para calcular la distancia mas corta(retorna la distancia mas corta entre dos ciudades como un entero)
 int distanciaMenor = 0;
 string rutaMenor = "";
-int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
-{
-    cout << "\nOrigen: " << origen->nombre << "Destino: " << destino->nombre << "Ruta: " << ruta << "Distancia: " << dis;
-    if ((origen == NULL) or (origen->visitado == true))
+int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis)
+{                           
+    cout << "\nOrigen: " << origen->nombre << "    Destino: " << destino->nombre << "  Ruta: " << ruta << "   Distancia: " << dis;
+    if (origen->visitado == true))
         return 0;
 
     if (origen->nombre == destino->nombre)
@@ -711,7 +711,7 @@ int calcDistancia(Vertice *origen, Vertice *destino, string ruta, int dis)
     while (tempA != origen->arcos.end())
     {
         //cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << " La distancia es: " << dis << " - Dentro del while" << endl;
-        calcDistancia(tempA->destino, destino, ruta + origen->nombre, dis + tempA->distancia);
+        calcDistancia(tempA->destino, destino, ruta + origen.nombre, dis + tempA->distancia);
         cout << "Salió" << endl;
         tempA++;
     }

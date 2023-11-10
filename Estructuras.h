@@ -12,9 +12,9 @@ struct Vertice;
 struct Arco
 {
     int distancia;
-    Vertice *destino;
+    Vertice destino;
 
-    Arco(int dist, Vertice *dest);
+    Arco(int dist, Vertice dest);
 };
 
 struct Vertice
@@ -22,19 +22,19 @@ struct Vertice
     string nombre;
     list<string> actividades;
     list<Arco> arcos;
-    Vertice *siguiente;
+    //Vertice *siguiente;
     bool visitado = false;
 
     // Constructor
-    Vertice(const string &nombre);
+    Vertice(const string nombre);
 
     // Agregar
-    void addActividad(const string &actividad);
-    void addArco(int distancia, Vertice *destino);
+    void addActividad(const string actividad);
+    void addArco(int distancia, Vertice destino);
 
     // Remover
-    void removeActividad(const string &actividad);
-    void removeArco(const Arco &arco);
+    void removeActividad(const string actividad);
+    void removeArco(const Arco arco);
 };
 
 /*struct Persona {
