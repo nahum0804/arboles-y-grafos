@@ -415,11 +415,16 @@ void createTree(list<Persona> listaPersonas)
             while (!listaTmp.empty())
             {
                 if (listaTmp.front().genero == 'M')
+                {
                     listaHombres.push_back(listaTmp.front());
+                }
                 else
+                {
                     listaMujeres.push_back(listaTmp.front());
+                }
                 listaTmp.pop_front();
             }
+
             // Crear nodos hijos
             Nodo *hijo1 = new Nodo(listaHombres);
             Nodo *hijo2 = new Nodo(listaMujeres);
@@ -739,9 +744,12 @@ int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis)
     }
     origen.visitado = true;
 
-    for (const Arco &tempA : origen.arcos)
+    for (auto &arco : origen.arcos)
     {
-        calcDistancia(tempA.destino, destino, ruta + origen.nombre, dis + tempA.distancia);
+        if (arco.destino.nombre != origen.nombre)
+        {
+            calcDistancia(arco.destino, destino, "", dis + arco.distancia);
+        }
     }
     origen.visitado = false;
     return distanciaMenor;
