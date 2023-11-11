@@ -26,7 +26,7 @@ void Vertice::addActividad(const string actividad)
 void Vertice::addArco(int distancia, Vertice destino)
 {
     // Verificar si el arco ya existe en el vector de arcos
-    for (const Arco arco : arcos)
+    for (Arco arco : arcos)
     {
         if (arco.destino == destino)
         {
@@ -36,9 +36,20 @@ void Vertice::addArco(int distancia, Vertice destino)
     }
     // Agregar el arco si no existe
     arcos.push_back({distancia, destino});
-    destino.arcos.push_back({distancia, this});
+    destino.addArco(distancia, *this);
 }
 
+/*
+
+
+Persona::Persona(char genero, int edad, char origen1, char destino1, char actividad1) : genero(genero), edad(edad)
+{
+
+    strcpy(origen, origen1);
+    strcpy(destino, destino1);
+    strcpy(actividad, actividad1);
+}
+*/
 struct Persona
 {
     char genero;
@@ -47,12 +58,12 @@ struct Persona
     char destino[15];
     char actividad[30];
 
-    Persona(char genero, int edad, const char origen, const char destino, char actividad);
+    Persona(char genero, int edad, const char origen[15], const char destino[15], const char actividad[30]);
 };
 
-Persona::Persona(char genero, int edad, const char origen1, const char destino1, char actividad1) : genero(genero), edad(edad)
+Persona::Persona(char genero, int edad, const char origen1[15], const char destino1[15], const char actividad1[30])
+    : genero(genero), edad(edad)
 {
-
     strcpy(origen, origen1);
     strcpy(destino, destino1);
     strcpy(actividad, actividad1);
@@ -81,22 +92,22 @@ void registrarActividades();
 void showVerticeData(Vertice vertice);
 int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis);
 
-void createVertice(list<Vertice> vertices, const string nombreV);
-void deleteVertice(list<Vertice> vertices, const Vertice vertice);
-void modificarVertice(Vertice vertice, const string nuevoNombre);
+void createVertice(list<Vertice> &vertices, const string nombreV);
+void deleteVertice(list<Vertice> &vertices, const Vertice &vertice);
+void modificarVertice(Vertice vertice, const string &nuevoNombre);
 
 void createArco(string origen, string destino);
-void deleteArco(Vertice vertice, const string nombreDestino);
-void modificarArco(Vertice vertice, const string nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
+void deleteArco(Vertice &vertice, const string &nombreDestino);
+void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
 
 void showRutaCorta(string origen, string destino, Vertice listaVertices);
 void showActividaesPosibles(string destino, Vertice listaVertices);
 string getActividad(string actividad, Vertice listaVertices);
 
 void getListaVertices(list<Vertice> listaVertices);
-Vertice getVertice(const string nombre, list<Vertice> listaVertices);
+Vertice getVertice(const string &nombre, list<Vertice> listaVertices);
 
-//void dijkstra(Vertice inicio, Vertice destino);
+Arco getArco(Vertice &vertice, const string &nombreDestino);
 
 void getListaActividades(list<string> listaActividades);
 
@@ -121,21 +132,41 @@ void cargarDatos()
     v1.addArco(25, v8);
     v1.addArco(40, v9);
 
+    v2.addArco(35, v3);
+    v2.addArco(110, v6);
+    v2.addArco(30, v10);
+
+    v3.addArco(15, v1);
     v3.addArco(10, v11);
     v3.addArco(35, v2);
 
+    v5.addArco(90, v9);
+    v5.addArco(110, v13);
+
     v6.addArco(110, v2);
 
+    v7.addArco(15, v8);
+    v7.addArco(25, v10);
+    v7.addArco(20, v12);
+    v7.addArco(50, v13);
+
+    v8.addArco(25, v1);
     v8.addArco(15, v7);
     v8.addArco(10, v12);
 
+    v9.addArco(40, v1);
     v9.addArco(90, v5);
 
     v10.addArco(30, v2);
     v10.addArco(15, v11);
     v10.addArco(25, v7);
 
+    v11.addArco(10, v3);
+    v11.addArco(15, v10);
+
     v12.addArco(20, v7);
+    v12.addArco(10, v8);
+    v12.addArco(30, v13);
 
     v13.addArco(30, v12);
     v13.addArco(50, v7);
@@ -587,9 +618,9 @@ int main()
 
             cout << "Ciudad de partida: " << origenVertice.nombre << endl;
             cout << "Ciudad de destino: " << destinoVertice.nombre << endl;
-
+            int distanciaMenor = 0;
             int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
-            cout << "\nLa ruta es: " << origen + "-" + destino << "La distancia es: " << dist;
+            cout << "\nLa ruta es: " << origen + "-" + destino << ", La distancia es: " << dist;
         }
         else if (opcion == 4)
         {
@@ -689,33 +720,30 @@ int main()
 // Funcion para calcular la distancia mas corta(retorna la distancia mas corta entre dos ciudades como un entero)
 int distanciaMenor = 0;
 string rutaMenor = "";
-int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis)
-{                           
-    cout << "\nOrigen: " << origen->nombre << "    Destino: " << destino->nombre << "  Ruta: " << ruta << "   Distancia: " << dis;
-    if (origen->visitado == true))
-        return 0;
 
-    if (origen->nombre == destino->nombre)
+int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis)
+{
+    cout << "\nOrigen: " << origen.nombre << "    Destino: " << destino.nombre << "  Ruta: " << ruta << "   Distancia: " << dis;
+    if (origen.visitado == true)
+        return distanciaMenor;
+
+    if (origen.nombre == destino.nombre)
     {
-        cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << "La distancia es" << dis;
+        cout << "\nLa ruta es: " << ruta + "-" + destino.nombre << "La distancia es" << dis;
         if ((distanciaMenor == 0) || (dis < distanciaMenor))
         {
             distanciaMenor = dis;
-            rutaMenor = ruta + "-" + destino->nombre;
-            // cout << "\nLa ruta es: " << rutaMenor << "La distancia es: " <distanciaMenor;
+            rutaMenor = ruta + "-" + destino.nombre;
+            cout << "\nLa ruta es: " << rutaMenor << "La distancia es: " << distanciaMenor;
         }
     }
-    origen->visitado = true;
+    origen.visitado = true;
 
-    list<Arco>::iterator tempA = origen->arcos.begin();
-    while (tempA != origen->arcos.end())
+    for (const Arco &tempA : origen.arcos)
     {
-        //cout << "\nLa ruta es: " << ruta + "-" + destino->nombre << " La distancia es: " << dis << " - Dentro del while" << endl;
-        calcDistancia(tempA->destino, destino, ruta + origen.nombre, dis + tempA->distancia);
-        cout << "Salió" << endl;
-        tempA++;
+        calcDistancia(tempA.destino, destino, ruta + origen.nombre, dis + tempA.distancia);
     }
-    origen->visitado = false;
+    origen.visitado = false;
     return distanciaMenor;
 }
 
@@ -725,6 +753,10 @@ void getListaVertices(list<Vertice> listaVertices)
     for (auto vertice : listaVertices)
     {
         cout << vertice.nombre << endl;
+        for (auto arco : vertice.arcos)
+        {
+            cout << arco.distancia << endl;
+        }
     }
 }
 
@@ -749,23 +781,22 @@ Vertice getVertice(const string &nombre, list<Vertice> listaVertices)
     cout << "No se encontro el vertice" << endl;
 }
 
-Arco *getArco(Vertice &vertice, const string &nombreDestino)
+Arco getArco(Vertice &vertice, const string &nombreDestino)
 {
     for (Arco &arco : vertice.arcos)
     {
-        if (arco.destino->nombre == nombreDestino)
+        if (arco.destino.nombre == nombreDestino)
         {
-            return &arco;
+            return arco;
         }
     }
     cout << "\nNo se encontró la ruta";
-    return nullptr; // El arco no se encontró
 }
 
 // Obtener la actividad de un vertice
-string getActividad(string actividad, Vertice *destino)
+string getActividad(string actividad, Vertice destino)
 {
-    for (auto act : destino->actividades)
+    for (auto act : destino.actividades)
     {
         if (act == actividad)
         {
@@ -783,7 +814,7 @@ void createVertice(list<Vertice> &vertices, const string nombreV)
 }
 
 // Funcion para modificar vertices
-void modificarVertice(Vertice &vertice, const string &nuevoNombre)
+void modificarVertice(Vertice vertice, const string &nuevoNombre)
 {
     vertice.nombre = nuevoNombre;
 }
@@ -798,11 +829,11 @@ void deleteVertice(list<Vertice> &vertices, const Vertice &vertice)
 // Función para modificar un arco
 void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino)
 {
-    Arco *arco = getArco(vertice, nombreDestino);
-    if (arco)
+    Arco arco = getArco(vertice, nombreDestino);
+    if (arco.distancia != 0 || !arco.destino.nombre.empty())
     {
-        arco->distancia = nuevaDistancia;
-        arco->destino = &nuevoDestino;
+        arco.distancia = nuevaDistancia;
+        arco.destino = nuevoDestino;
         cout << "Ruta modificada con éxito." << endl;
     }
     else
@@ -814,10 +845,10 @@ void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistan
 // Función para eliminar un arco
 void deleteArco(Vertice &vertice, const string &nombreDestino)
 {
-    Arco *arco = getArco(vertice, nombreDestino);
-    if (arco)
+    Arco arco = getArco(vertice, nombreDestino);
+    if (arco.distancia != 0 || !arco.destino.nombre.empty())
     {
-        //vertice.arcos.remove(*arco);
+        // vertice.arcos.remove(*arco);
         cout << "Eliminaria el arco de " << vertice.nombre << " hasta " << nombreDestino << endl;
     }
     else

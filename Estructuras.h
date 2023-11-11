@@ -7,22 +7,14 @@
 
 using namespace std;
 
-struct Vertice;
-
-struct Arco
-{
-    int distancia;
-    Vertice destino;
-
-    Arco(int dist, Vertice dest);
-};
+struct Arco;
 
 struct Vertice
 {
     string nombre;
     list<string> actividades;
     list<Arco> arcos;
-    //Vertice *siguiente;
+    // Vertice *siguiente;
     bool visitado = false;
 
     // Constructor
@@ -35,19 +27,20 @@ struct Vertice
     // Remover
     void removeActividad(const string actividad);
     void removeArco(const Arco arco);
+
+    // Operador de igualdad
+    bool operator==(const Vertice &other) const
+    {
+        return nombre == other.nombre && actividades == other.actividades;
+    }
 };
 
-/*struct Persona {
-    string genero;
-    int edad;
-    Vertice* origen;
-    Vertice* destino;
-    string actividad;
+struct Arco
+{
+    int distancia;
+    Vertice destino;
+
+    Arco(int dist, Vertice dest);
 };
-
-
-struct Nodo {
-    Nodo* siguiente;
-};*/
 
 #endif
