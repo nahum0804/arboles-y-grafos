@@ -8,10 +8,14 @@
 #include "fstream"
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
-Arco::Arco(int dist, Vertice dest) : distancia(dist), destino(dest) {}
+std::list<Vertice> listaVertices;
+std::list<string> listaActividades;
+
+Arco::Arco(int dist, Vertice *dest) : distancia(dist), destino(dest) {}
 
 // Implementación del constructor de Vertice
 Vertice::Vertice(const string nombre) : nombre(nombre) {}
@@ -22,22 +26,59 @@ void Vertice::addActividad(const string actividad)
     actividades.push_back(actividad);
 }
 
-// Implementación de la función para agregar arcos
-void Vertice::addArco(int distancia, Vertice destino)
+void Vertice::addArco(int distancia, string inicio, string destino)
 {
-    // Verificar si el arco ya existe en el vector de arcos
-    for (Arco arco : arcos)
+    Vertice *origen = nullptr;
+
+    for(auto &vertice : listaVertices)
     {
-        if (arco.destino == destino)
+        if(vertice.nombre == inicio)
         {
-            // El arco ya existe, no es necesario agregarlo de nuevo
-            return;
+            origen = &vertice;
+            break;
         }
     }
-    // Agregar el arco si no existe
-    arcos.push_back({distancia, destino});
-    destino.addArco(distancia, *this);
+
+    if(origen == nullptr)
+    {
+        cout << "No se encontró el vértice de origen al que se le desea agregar la conexion (Origen)" << endl;
+        return;
+    }
+
+    Vertice *dest = nullptr;
+
+    if(listaVertices.empty()){
+        cout << "No hay vertices dentro de la lista vertices" << endl;
+        return;
+    }
+
+    for(auto &vertice : listaVertices)
+    {
+        cout << vertice.nombre << endl;
+        if(vertice.nombre == destino)
+        {
+            dest = &vertice;
+            break;
+        }
+    }
+
+    if(dest == nullptr)
+    {
+        cout << "No se encontró el vértice de destino al que se le desea agregar la conexion (Destino)" << endl;
+        return;
+    }
+
+    if(origen == dest)
+    {
+        cout << "No se puede agregar una conexion al mismo vértice" << endl;
+        return;
+    }
+
+    Arco arco = Arco(distancia, dest);
+    origen->arcos.push_back(arco);
+    cout << "Se agregó la conexion correctamente de " << origen->nombre << " a " << dest->nombre << endl;
 }
+
 
 /*
 
@@ -83,22 +124,27 @@ struct Nodo
     }
 };
 
+struct Distancia
+{
+    int distancia;
+    string ruta;
+};
+
+
 // Prototypes
-list<Vertice> listaVertices;
-list<string> listaActividades;
 void cargarDatos();
 void registrarActividades();
 
 void showVerticeData(Vertice vertice);
-int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis);
+int calcDistancia(Vertice &origen, Vertice &destino, string ruta, int dis);
 
-void createVertice(list<Vertice> &vertices, const string nombreV);
-void deleteVertice(list<Vertice> &vertices, const Vertice &vertice);
-void modificarVertice(Vertice vertice, const string &nuevoNombre);
+void createVertice(list<Vertice*> &vertices, const string nombreV);
+void deleteVertice(list<Vertice*> &vertices, const Vertice &vertice);
+void modificarVertice(Vertice* vertice, string &nuevoNombre);
 
 void createArco(string origen, string destino);
 void deleteArco(Vertice &vertice, const string &nombreDestino);
-void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino);
+void modificarArco(Vertice &vertice, string &nombreDestino, int nuevaDistancia, Vertice &nuevoDestino);
 
 void showRutaCorta(string origen, string destino, Vertice listaVertices);
 void showActividaesPosibles(string destino, Vertice listaVertices);
@@ -110,6 +156,9 @@ Vertice getVertice(const string &nombre, list<Vertice> listaVertices);
 Arco getArco(Vertice &vertice, const string &nombreDestino);
 
 void getListaActividades(list<string> listaActividades);
+
+void calcRutaCorta(string origen,  string destino);
+void encontrarRuta(Vertice* origen, Vertice* destino, std::vector<Vertice*>& listaRutaVertices, std::vector<std::vector<Vertice*>>& listaRutaTodosVertices, std::vector<int>& listaDistancias, int distanciaTotal);
 
 void cargarDatos()
 {
@@ -127,50 +176,49 @@ void cargarDatos()
     Vertice v12("Venecia");
     Vertice v13("Rio_Cuarto");
 
-    // Conexiones entre vértices (arcos)
-    v1.addArco(15, v3);
-    v1.addArco(25, v8);
-    v1.addArco(40, v9);
+    // v1.addArco(15, &v3);
+    // v1.addArco(25, &v8);
+    // v1.addArco(40, &v9);
 
-    v2.addArco(35, v3);
-    v2.addArco(110, v6);
-    v2.addArco(30, v10);
+    // v2.addArco(35, &v3);
+    // v2.addArco(110, &v6);
+    // v2.addArco(30, &v10);
 
-    v3.addArco(15, v1);
-    v3.addArco(10, v11);
-    v3.addArco(35, v2);
+    // v3.addArco(15, &v1);
+    // v3.addArco(10, &v11);
+    // v3.addArco(35, &v2);
 
-    v5.addArco(90, v9);
-    v5.addArco(110, v13);
+    // v5.addArco(90, &v9);
+    // v5.addArco(110, &v13);
 
-    v6.addArco(110, v2);
+    // v6.addArco(110, &v2);
 
-    v7.addArco(15, v8);
-    v7.addArco(25, v10);
-    v7.addArco(20, v12);
-    v7.addArco(50, v13);
+    // v7.addArco(15, &v8);
+    // v7.addArco(25, &v10);
+    // v7.addArco(20, &v12);
+    // v7.addArco(50, &v13);
 
-    v8.addArco(25, v1);
-    v8.addArco(15, v7);
-    v8.addArco(10, v12);
+    // v8.addArco(25, &v1);
+    // v8.addArco(15, &v7);
+    // v8.addArco(10, &v12);
 
-    v9.addArco(40, v1);
-    v9.addArco(90, v5);
+    // v9.addArco(40, &v1);
+    // v9.addArco(90, &v5);
 
-    v10.addArco(30, v2);
-    v10.addArco(15, v11);
-    v10.addArco(25, v7);
+    // v10.addArco(30, &v2);
+    // v10.addArco(15, &v11);
+    // v10.addArco(25, &v7);
 
-    v11.addArco(10, v3);
-    v11.addArco(15, v10);
+    // v11.addArco(10, &v3);
+    // v11.addArco(15, &v10);
 
-    v12.addArco(20, v7);
-    v12.addArco(10, v8);
-    v12.addArco(30, v13);
+    // v12.addArco(20, &v7);
+    // v12.addArco(10, &v8);
+    // v12.addArco(30, &v13);
 
-    v13.addArco(30, v12);
-    v13.addArco(50, v7);
-    v13.addArco(110, v5);
+    // v13.addArco(30, &v12);
+    // v13.addArco(50, &v7);
+    // v13.addArco(110, &v5);
 
     // Agregando actividades
     v1.addActividad("Shopping");
@@ -251,6 +299,51 @@ void cargarDatos()
     listaVertices.push_back(v11);
     listaVertices.push_back(v12);
     listaVertices.push_back(v13);
+
+    // Conexiones entre vértices (arcos)
+    v1.addArco(15, "Ciudad_Quesada", "Florencia");
+    v1.addArco(25, "Ciudad_Quesada", "Aguas_Zarcas");
+    v1.addArco(40, "Ciudad_Quesada", "Zarcero");
+
+    v2.addArco(35, "La_Fortuna", "Florencia");
+    v2.addArco(110, "La_Fortuna", "Liberia");
+    v2.addArco(30, "La_Fortuna", "Muelle");
+
+    v3.addArco(15, "Florencia", "Ciudad_Quesada");
+    v3.addArco(10, "Florencia", "Platanar");
+    v3.addArco(35, "Florencia", "La_Fortuna");
+
+    v5.addArco(90, "San_Jose", "Zarcero");
+    v5.addArco(110, "San_Jose", "Rio_Cuarto");
+
+    v6.addArco(110, "Liberia", "La_Fortuna");
+
+    v7.addArco(15, "Pital", "Aguas_Zarcas");
+    v7.addArco(25, "Pital", "Muelle");
+    v7.addArco(20, "Pital", "Venecia");
+    v7.addArco(50, "Pital", "Rio_Cuarto");
+
+    v8.addArco(25, "Aguas_Zarcas", "Ciudad_Quesada");
+    v8.addArco(15, "Aguas_Zarcas", "Pital");
+    v8.addArco(10, "Aguas_Zarcas", "Venecia");
+
+    v9.addArco(40, "Zarcero", "Ciudad_Quesada");
+    v9.addArco(90, "Zarcero", "San_Jose");
+
+    v10.addArco(30, "Muelle", "La_Fortuna");
+    v10.addArco(15, "Muelle", "Platanar");
+    v10.addArco(25, "Muelle", "Pital");
+
+    v11.addArco(10, "Platanar", "Florencia");
+    v11.addArco(15, "Platanar", "Muelle");
+
+    v12.addArco(20, "Venecia", "Pital");
+    v12.addArco(10, "Venecia", "Aguas_Zarcas");
+    v12.addArco(30, "Venecia", "Rio_Cuarto");
+
+    v13.addArco(30, "Rio_Cuarto", "Venecia");
+    v13.addArco(50, "Rio_Cuarto", "Pital");
+    v13.addArco(110, "Rio_Cuarto", "San_Jose");
 
     // Construct Persons and add in the binary file
 
@@ -599,8 +692,8 @@ int main()
         {
             leerArchivo();
             cout << "\n \nArchivo leido \n \n";
-            Vertice x = getVertice("La_Fortuna", listaVertices);
-            calcPorcentaje(x);
+            //Vertice x = getVertice("La_Fortuna", listaVertices);
+            //calcPorcentaje(x);
         }
         else if (opcion == 0)
             break;
@@ -623,9 +716,10 @@ int main()
 
             cout << "Ciudad de partida: " << origenVertice.nombre << endl;
             cout << "Ciudad de destino: " << destinoVertice.nombre << endl;
-            int distanciaMenor = 0;
-            int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
-            cout << "\nLa ruta es: " << origen + "-" + destino << ", La distancia es: " << dist;
+            // int distanciaMenor = 0;
+            // int dist = calcDistancia(origenVertice, destinoVertice, " ", 0);
+            // cout << "\nLa ruta es: " << origen + "-" + destino << ", La distancia es: " << dist;
+            calcRutaCorta(origen, destino);
         }
         else if (opcion == 4)
         {
@@ -638,7 +732,7 @@ int main()
             cout << "\nIngrese el nombre de la nueva ciudad: ";
             cin >> nombreVertice;
             cin.ignore();
-            createVertice(listaVertices, nombreVertice);
+            //createVertice(listaVertices, nombreVertice);
         }
         else if (opcion == 6)
         {
@@ -652,7 +746,7 @@ int main()
                 cout << "\nIngrese el nuevo nombre para la ciudad: ";
                 cin >> nuevoNombre;
                 cin.ignore();
-                modificarVertice(modVertice, nuevoNombre);
+                //modificarVertice(modVertice, nuevoNombre);
             }
             else
             {
@@ -666,7 +760,7 @@ int main()
             cin >> nombreVertice;
             cin.ignore();
             Vertice dVertice = getVertice(nombreVertice, listaVertices);
-            deleteVertice(listaVertices, dVertice);
+            //deleteVertice(listaVertices, *dVertice);
         }
         else if (opcion == 8)
         {
@@ -683,7 +777,7 @@ int main()
             cout << "\nDigite la distancia entre el origen y el destino: ";
             cin >> dist;
             cin.ignore();
-            origenVertice.addArco(dist, destinoVertice);
+            //origenVertice.addArco(dist, destinoVertice);
         }
         else if (opcion == 9)
         {
@@ -703,7 +797,7 @@ int main()
             cout << "\nIngrese la distancia de la ruta: ";
             cin >> nDist;
             cin.ignore();
-            modificarArco(origenVertice, nDestino, nDist, destinoArco);
+            //modificarArco(origenVertice, nDestino, nDist, destinoArco);
         }
         else if (opcion == 10)
         {
@@ -726,44 +820,48 @@ int main()
 int distanciaMenor = 0;
 string rutaMenor = "";
 
-int calcDistancia(Vertice origen, Vertice destino, string ruta, int dis)
+
+int calcDistancia(Vertice& origen, Vertice& destino, string ruta, int dis)
 {
-    cout << "\nOrigen: " << origen.nombre << "    Destino: " << destino.nombre << "  Ruta: " << ruta << "   Distancia: " << dis;
-    if (origen.visitado == true)
+    if (origen.visitado)
         return distanciaMenor;
 
     if (origen.nombre == destino.nombre)
     {
-        cout << "\nLa ruta es: " << ruta + "-" + destino.nombre << "La distancia es" << dis;
-        if ((distanciaMenor == 0) || (dis < distanciaMenor))
+        cout << "\nLa ruta es: " << ruta + " - " + destino.nombre << "La distancia es" << dis;
+        if ((distanciaMenor == 0) || (dis < distanciaMenor)) //(
         {
             distanciaMenor = dis;
-            rutaMenor = ruta + "-" + destino.nombre;
-            cout << "\nLa ruta es: " << rutaMenor << "La distancia es: " << distanciaMenor;
+            ruta = ruta + "-" + destino.nombre;
+            cout << "\nLa ruta es: " << ruta << "La distancia es: " << distanciaMenor;
         }
     }
     origen.visitado = true;
 
     for (auto &arco : origen.arcos)
     {
-        if (arco.destino.nombre != origen.nombre)
+        if (arco.destino->nombre != origen.nombre)
         {
-            calcDistancia(arco.destino, destino, "", dis + arco.distancia);
+            cout << "\n"<< arco.destino->nombre << " comparando con " << origen.nombre << endl;
+            calcDistancia(*(arco.destino), destino, ruta, dis + arco.distancia);
         }
     }
     origen.visitado = false;
     return distanciaMenor;
 }
 
+
 void getListaVertices(list<Vertice> listaVertices)
 {
     cout << endl;
     for (auto vertice : listaVertices)
     {
+        cout << "\n" << endl;
         cout << vertice.nombre << endl;
+        cout << "Sus arcos: " << endl; 
         for (auto arco : vertice.arcos)
         {
-            cout << arco.distancia << endl;
+            cout << arco.destino->nombre << endl;
         }
     }
 }
@@ -793,7 +891,7 @@ Arco getArco(Vertice &vertice, const string &nombreDestino)
 {
     for (Arco &arco : vertice.arcos)
     {
-        if (arco.destino.nombre == nombreDestino)
+        if (arco.destino->nombre == nombreDestino)
         {
             return arco;
         }
@@ -815,33 +913,33 @@ string getActividad(string actividad, Vertice destino)
 }
 
 // Función para agregar un vértice a una lista de vértices
-void createVertice(list<Vertice> &vertices, const string nombreV)
+void createVertice(list<Vertice*> &vertices, string nombreV)
 {
     Vertice nuevoVertice(nombreV);
-    vertices.push_back(nuevoVertice);
+    vertices.push_back(&nuevoVertice);
 }
 
 // Funcion para modificar vertices
-void modificarVertice(Vertice vertice, const string &nuevoNombre)
+void modificarVertice(Vertice *vertice, string &nuevoNombre)
 {
-    vertice.nombre = nuevoNombre;
+    vertice->nombre = nuevoNombre;
 }
 
 // Función para eliminar un vértice de una lista de vértices
-void deleteVertice(list<Vertice> &vertices, const Vertice &vertice)
+void deleteVertice(list<Vertice*> &vertices, const Vertice &vertice)
 {
     // vertices.remove(vertice);
     cout << "Eliminaria el vertice " << vertice.nombre << endl;
 }
 
 // Función para modificar un arco
-void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistancia, Vertice nuevoDestino)
+void modificarArco(Vertice &vertice, string nombreDestino, int nuevaDistancia, Vertice &nuevoDestino)
 {
     Arco arco = getArco(vertice, nombreDestino);
-    if (arco.distancia != 0 || !arco.destino.nombre.empty())
+    if (arco.distancia != 0 || !arco.destino->nombre.empty())
     {
         arco.distancia = nuevaDistancia;
-        arco.destino = nuevoDestino;
+        arco.destino = &nuevoDestino;
         cout << "Ruta modificada con éxito." << endl;
     }
     else
@@ -854,7 +952,7 @@ void modificarArco(Vertice vertice, const string &nombreDestino, int nuevaDistan
 void deleteArco(Vertice &vertice, const string &nombreDestino)
 {
     Arco arco = getArco(vertice, nombreDestino);
-    if (arco.distancia != 0 || !arco.destino.nombre.empty())
+    if (arco.distancia != 0 || !arco.destino->nombre.empty())
     {
         // vertice.arcos.remove(*arco);
         cout << "Eliminaria el arco de " << vertice.nombre << " hasta " << nombreDestino << endl;
@@ -863,4 +961,84 @@ void deleteArco(Vertice &vertice, const string &nombreDestino)
     {
         cout << "Arco no encontrado." << endl;
     }
+}
+
+//Calcula la ruta más corta entre dos ciudades
+void calcRutaCorta(string origen,  string destino){
+    Vertice* partida = nullptr;
+    Vertice* final = nullptr;
+
+    std::vector<int> listaDistancias;
+    std::vector<std::vector<Vertice*>> listaTodasRutaVertices;
+    std::vector<Vertice*> listaRutaVertices;
+
+    for (Vertice& vertice : listaVertices)
+    {
+        if (vertice.nombre == origen)
+        {
+            partida = &vertice;
+        }
+        else if (vertice.nombre == destino)
+        {
+            final = &vertice;
+        }
+    }
+
+    //Calcular la ruta más corta con la funcion
+    encontrarRuta(partida, final, listaRutaVertices, listaTodasRutaVertices, listaDistancias, 0);
+
+    if(listaTodasRutaVertices.empty()){
+        cout << "No se encontró una ruta" << endl;
+    }
+
+
+    auto it = std::min_element(listaDistancias.begin(), listaDistancias.end());
+    //int indice = std::distance(listaDistancias.begin(), it);
+
+    if(it != listaDistancias.end()){
+        int indice = std::distance(listaDistancias.begin(), it);
+        cout << "La ruta más corta es: " << endl;
+        //cout << listaRutaVertices[indice]->nombre <<  " Uy" << endl;
+        for(size_t i = 0; i < listaTodasRutaVertices[indice].size(); i++){
+                cout << listaTodasRutaVertices[indice][i]->nombre;
+                if(i < listaTodasRutaVertices[indice].size() - 1){
+                cout << " - ";
+            }
+        }
+        cout << "La distancia es: " << listaDistancias[indice] << endl;
+    }
+    else{
+        cout << "No se encontró una ruta (Llego al final)" << endl;
+    }
+}
+
+
+void encontrarRuta(Vertice* origen, Vertice* destino, std::vector<Vertice*>& listaRutaVertices, std::vector<std::vector<Vertice*>>& listaRutaTodosVertices, std::vector<int>& listaDistancias, int distanciaTotal)
+{
+    if (origen->visitado)
+        return;
+
+
+    origen->visitado = true;
+    listaVertices.push_back(*origen);
+
+    if (origen->nombre == destino->nombre)
+    {
+        listaRutaTodosVertices.push_back(listaRutaVertices);
+        listaDistancias.push_back(distanciaTotal);
+        //cout << "Ruta encontrada (con distancia de " << distanciaTotal << ") - Pasando por: " << origen->nombre << "." << endl;
+
+        return;
+    }
+
+    for (Arco& arco : origen->arcos)
+    {
+        if (arco.destino->nombre != origen->nombre)
+        {   
+            //cout << "Pasando por: " << origen->nombre << " - " << arco.destino->nombre << endl;
+            encontrarRuta(arco.destino, destino, listaRutaVertices, listaRutaTodosVertices, listaDistancias, distanciaTotal + arco.distancia);
+        }
+    }
+    origen->visitado = false;
+    listaRutaVertices.pop_back();
 }

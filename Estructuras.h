@@ -22,7 +22,8 @@ struct Vertice
 
     // Agregar
     void addActividad(const string actividad);
-    void addArco(int distancia, Vertice destino);
+    void addArco(int distancia, string inicio, string destino);
+    //void (int distancia, Vertice *destino);
 
     // Remover
     void removeActividad(const string actividad);
@@ -38,9 +39,9 @@ struct Vertice
 struct Arco
 {
     int distancia;
-    Vertice destino;
+    Vertice *destino;
 
-    Arco(int dist, Vertice dest);
+    Arco(int dist, Vertice *dest);
 };
 
 #endif

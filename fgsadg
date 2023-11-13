@@ -1,0 +1,89 @@
+[33mcommit 8fdbcac9b3e4ae741b30755f81560538b4107369[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: garu7c <gary07caldera@gmail.com>
+Date:   Sat Nov 11 16:11:34 2023 -0600
+
+    calcDistancia
+
+[33mcommit 084052bff5891936a60b2040c484ff41f3beee11[m
+Author: garu7c <gary07caldera@gmail.com>
+Date:   Fri Nov 10 22:48:06 2023 -0600
+
+    Solucion de errores
+
+[33mcommit c35214b5d64d56b9e040862cff6333e610fa6164[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Thu Nov 9 19:47:11 2023 -0600
+
+    Add others configs
+
+[33mcommit 886ade704473bf8573242aef7ff132eb4b75614d[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Wed Nov 8 23:47:23 2023 -0600
+
+    No mucho nuevo, casi insignificante
+
+[33mcommit 01d77290e5ee4d32d90c73d20dbc1763692ed69b[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Sat Nov 4 15:01:02 2023 -0600
+
+    Bin file already!
+
+[33mcommit 8321e3b23614fcbad0b0e750cc506b02f920571f[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Sat Nov 4 11:53:27 2023 -0600
+
+    Bin file already!
+
+[33mcommit a97760a0c3fa21d1a38359a6c77366fc086b13e7[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Fri Nov 3 17:13:31 2023 -0600
+
+    Bin file persons already
+
+[33mcommit ad1ff147b475affedeeaaae01d408aabc0a067fb[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Thu Nov 2 00:10:17 2023 -0600
+
+    Save in bin file, but little error with last element
+
+[33mcommit 0508fbd7044ceb81f5f8cf76e820eeb32e6f3106[m
+Author: garu7c <gary07caldera@gmail.com>
+Date:   Wed Nov 1 22:19:24 2023 -0600
+
+    captura la ruta mas corta
+
+[33mcommit 78114b7eb71c2798e7adcc5dcb9230468547aeb3[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Wed Nov 1 10:36:50 2023 -0600
+
+    Calc Distances Function Added
+
+[33mcommit e6e9dba58e063f01af62c493c98ccce72be51174[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Mon Oct 30 23:45:29 2023 -0600
+
+    Check grafos functionality
+
+[33mcommit 61e92324d702b954bfc03f55798ec89e0943a61e[m
+Author: garu7c <gary07caldera@gmail.com>
+Date:   Mon Oct 30 22:30:42 2023 -0600
+
+    lista de vertices
+
+[33mcommit 64a55f53a9116817c4efc822f2fbcc01920802d3[m
+Author: garu7c <gary07caldera@gmail.com>
+Date:   Mon Oct 30 21:33:01 2023 -0600
+
+    Arreglo de titulos y agrego de .exe
+
+[33mcommit ad806b89196a228766f17b42c164bef87001658f[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Mon Oct 30 21:07:46 2023 -0600
+
+    Other improves xd
+
+[33mcommit 1fb105c47e7bbb36d69ad25017b6449cdad2debe[m
+Author: Nahum Murillo <n4hummuro227@gmail.com>
+Date:   Fri Oct 20 17:11:35 2023 -0600
+
+    First Commit
