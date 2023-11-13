@@ -12,7 +12,7 @@ struct Arco;
 struct Vertice
 {
     string nombre;
-    list<string> actividades;
+    std::list<std::string *> actividades;
     list<Arco> arcos;
     // Vertice *siguiente;
     bool visitado = false;
@@ -21,9 +21,9 @@ struct Vertice
     Vertice(const string nombre);
 
     // Agregar
-    void addActividad(const string actividad);
+    void addActividad(const std::string &actividad);
     void addArco(int distancia, string inicio, string destino);
-    //void (int distancia, Vertice *destino);
+    // void (int distancia, Vertice *destino);
 
     // Remover
     void removeActividad(const string actividad);
