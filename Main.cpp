@@ -89,17 +89,6 @@ void Vertice::addArco(int distancia, string inicio, string destino)
     cout << "Se agregó la conexion correctamente de " << origen->nombre << " a " << dest->nombre << endl;
 }
 
-/*
-
-
-Persona::Persona(char genero, int edad, char origen1, char destino1, char actividad1) : genero(genero), edad(edad)
-{
-
-    strcpy(origen, origen1);
-    strcpy(destino, destino1);
-    strcpy(actividad, actividad1);
-}
-*/
 struct Persona
 {
     char genero;
@@ -133,21 +122,15 @@ struct Nodo
     }
 };
 
-struct Distancia
-{
-    int distancia;
-    string ruta;
-};
 
 // Prototypes
 void cargarDatos();
 void registrarActividades();
 
 void showVerticeData(Vertice vertice);
-int calcDistancia(Vertice &origen, Vertice &destino, string ruta, int dis);
 
 void createVertice(list<Vertice *> &vertices, const string nombreV);
-void deleteVertice(list<Vertice *> &vertices, const Vertice &vertice);
+void eliminarVertice(std::list<Vertice>& listaVertices, const Vertice& vertice);
 void modificarVertice(Vertice *vertice, string &nuevoNombre);
 
 void createArco(string origen, string destino);
@@ -168,6 +151,8 @@ void getListaActividades(list<string> listaActividades);
 void calcRutaCorta(string origen, string destino);
 void encontrarRuta(Vertice *origen, Vertice *destino, std::vector<Vertice *> &listaRutaVertices, std::vector<std::vector<Vertice *>> &listaRutaTodosVertices, std::vector<int> &listaDistancias, int distanciaTotal);
 
+void agregarPersona();
+
 void cargarDatos()
 {
     // Creación de vértices
@@ -183,50 +168,6 @@ void cargarDatos()
     Vertice v11("Platanar");
     Vertice v12("Venecia");
     Vertice v13("Rio_Cuarto");
-
-    // v1.addArco(15, &v3);
-    // v1.addArco(25, &v8);
-    // v1.addArco(40, &v9);
-
-    // v2.addArco(35, &v3);
-    // v2.addArco(110, &v6);
-    // v2.addArco(30, &v10);
-
-    // v3.addArco(15, &v1);
-    // v3.addArco(10, &v11);
-    // v3.addArco(35, &v2);
-
-    // v5.addArco(90, &v9);
-    // v5.addArco(110, &v13);
-
-    // v6.addArco(110, &v2);
-
-    // v7.addArco(15, &v8);
-    // v7.addArco(25, &v10);
-    // v7.addArco(20, &v12);
-    // v7.addArco(50, &v13);
-
-    // v8.addArco(25, &v1);
-    // v8.addArco(15, &v7);
-    // v8.addArco(10, &v12);
-
-    // v9.addArco(40, &v1);
-    // v9.addArco(90, &v5);
-
-    // v10.addArco(30, &v2);
-    // v10.addArco(15, &v11);
-    // v10.addArco(25, &v7);
-
-    // v11.addArco(10, &v3);
-    // v11.addArco(15, &v10);
-
-    // v12.addArco(20, &v7);
-    // v12.addArco(10, &v8);
-    // v12.addArco(30, &v13);
-
-    // v13.addArco(30, &v12);
-    // v13.addArco(50, &v7);
-    // v13.addArco(110, &v5);
 
     // Agregar actividades a lista global
     listaActividades.push_back("Shopping");
@@ -859,6 +800,7 @@ void menuPersonas()
     cout << "\n1. Leer Archivo";
     cout << "\n2. Consultar Personas";
     cout << "\n3. Consultar porcentaje por provincia";
+    cout << "\n4. Agregar Persona";
     cout << "\n0. Salir \n";
     cout << ">";
 }
@@ -928,6 +870,10 @@ int main()
                     else
                         cout << "No se encontró el vertice" << endl;
                 }
+                else if (opcionPersona == 4)
+                {
+                    agregarPersona();
+                }
                 else if (opcionPersona == 0)
                     break;
             }
@@ -948,6 +894,8 @@ int main()
                     string nombreVertice;
                     cout << "\nIngrese el nombre de la nueva ciudad: ";
                     cin >> nombreVertice;
+                    Vertice v = Vertice(nombreVertice);
+                    listaVertices.push_back(v);
                     cin.ignore();
                 }
                 else if (opcionCiudad == 3)
@@ -971,11 +919,13 @@ int main()
                 }
                 else if (opcionCiudad == 4)
                 {
-                    string nombreVertice;
-                    cout << "\nIngrese el nombre de la ciudad: ";
-                    cin >> nombreVertice;
+                    string origenArco, nDestino;
+                    cout << "\nIngrese el nombre de la ciudad a borrar: ";
+                    cin >> origenArco;
                     cin.ignore();
-                    Vertice dVertice = getVertice(nombreVertice, listaVertices);
+                    Vertice origenVertice = getVertice(origenArco, listaVertices);
+                    eliminarVertice(listaVertices, origenVertice);
+                    cout << "Vertice borrado con éxito!";
                 }
                 else if (opcionCiudad == 0)
                     break;
@@ -1024,6 +974,9 @@ int main()
                     cout << "\nDigite la distancia entre el origen y el destino: ";
                     cin >> dist;
                     cin.ignore();
+                    origenVertice.addArco(dist, nOrigen, nDestino);
+                    destinoVertice.addArco(dist, nDestino, nOrigen);
+                    cout << "Ruta creada con éxito!";
                 }
                 else if (opcionRuta == 3)
                 {
@@ -1047,14 +1000,12 @@ int main()
                 else if (opcionRuta == 4)
                 {
                     string origenArco, nDestino;
-                    cout << "\nIngrese el nombre de la ciudad de origen: ";
+                    cout << "\nIngrese el nombre de la ciudad a borrar: ";
                     cin >> origenArco;
                     cin.ignore();
                     Vertice origenVertice = getVertice(origenArco, listaVertices);
-                    cout << "\nIngrese el nombre de la ciudad destino: ";
-                    cin >> nDestino;
-                    cin.ignore();
-                    deleteArco(origenVertice, nDestino);
+                    eliminarVertice(listaVertices, origenVertice);
+                    cout << "Vertice borrado con éxito!";
                 }
                 else if (opcionRuta == 0)
                     break;
@@ -1070,39 +1021,6 @@ int main()
     return 0;
 }
 
-// Funcion para calcular la distancia mas corta(retorna la distancia mas corta entre dos ciudades como un entero)
-int distanciaMenor = 0;
-string rutaMenor = "";
-
-int calcDistancia(Vertice &origen, Vertice &destino, string ruta, int dis)
-{
-    if (origen.visitado)
-        return distanciaMenor;
-
-    if (origen.nombre == destino.nombre)
-    {
-        cout << "\nLa ruta es: " << ruta + " - " + destino.nombre << "La distancia es" << dis;
-        if ((distanciaMenor == 0) || (dis < distanciaMenor)) //(
-        {
-            distanciaMenor = dis;
-            ruta = ruta + "-" + destino.nombre;
-            cout << "\nLa ruta es: " << ruta << "La distancia es: " << distanciaMenor;
-        }
-    }
-    origen.visitado = true;
-
-    for (auto &arco : origen.arcos)
-    {
-        if (arco.destino->nombre != origen.nombre)
-        {
-            cout << "\n"
-                 << arco.destino->nombre << " comparando con " << origen.nombre << endl;
-            calcDistancia(*(arco.destino), destino, ruta, dis + arco.distancia);
-        }
-    }
-    origen.visitado = false;
-    return distanciaMenor;
-}
 
 void getListaVertices(list<Vertice> listaVertices)
 {
@@ -1200,17 +1118,10 @@ void modificarArco(Vertice &vertice, string nombreDestino, int nuevaDistancia, V
 }
 
 // Función para eliminar un arco
-void deleteArco(Vertice &vertice, const string &nombreDestino)
-{
-    Arco arco = getArco(vertice, nombreDestino);
-    if (arco.distancia != 0 || !arco.destino->nombre.empty())
-    {
-        // vertice.arcos.remove(*arco);
-        cout << "Eliminaria el arco de " << vertice.nombre << " hasta " << nombreDestino << endl;
-    }
-    else
-    {
-        cout << "Arco no encontrado." << endl;
+void eliminarVertice(std::list<Vertice>& listaVertices, const Vertice& vertice) {
+    auto it = std::find(listaVertices.begin(), listaVertices.end(), vertice);
+    if (it != listaVertices.end()) {
+        listaVertices.erase(it);
     }
 }
 
@@ -1295,4 +1206,29 @@ void encontrarRuta(Vertice *origen, Vertice *destino, std::vector<Vertice *> &li
     }
     origen->visitado = false;
     listaRutaVertices.pop_back();
+}
+
+void agregarPersona(){
+    char genero;
+    int edad;
+    char origen[15], destino[15], actividad[30];
+    cout << "Ingrese el genero de la persona(F/M): ";
+    cin >> genero;
+    cin.ignore();
+    cout << "Ingrese la edad de la persona: ";
+    cin >> edad;
+    cin.ignore();
+    cout << "Ingrese el origen de la persona: ";
+    cin.getline(origen, 15);
+    cout << "Ingrese el destino de la persona: ";
+    cin.getline(destino, 15);
+    cout << "Ingrese la actividad de la persona: ";
+    cin.getline(actividad, 30);
+
+    Persona nuevaPersona(genero, edad, origen, destino, actividad);
+    fstream file("persons.bin", ios::in | ios::binary | ios::app);
+
+    file.write(reinterpret_cast<char *>(&nuevaPersona), sizeof(Persona));
+    file.close();
+    cout << "Persona agregada con éxito!" << endl;
 }
