@@ -122,7 +122,6 @@ struct Nodo
     }
 };
 
-
 // Prototypes
 void cargarDatos();
 void registrarActividades();
@@ -130,7 +129,7 @@ void registrarActividades();
 void showVerticeData(Vertice vertice);
 
 void createVertice(list<Vertice *> &vertices, const string nombreV);
-void eliminarVertice(std::list<Vertice>& listaVertices, const Vertice& vertice);
+void eliminarVertice(std::list<Vertice> &listaVertices, const Vertice &vertice);
 void modificarVertice(Vertice *vertice, string &nuevoNombre);
 
 void createArco(string origen, string destino);
@@ -147,9 +146,14 @@ Vertice getVertice(const string &nombre, list<Vertice> listaVertices);
 Arco getArco(Vertice &vertice, const string &nombreDestino);
 
 void getListaActividades(list<string> listaActividades);
+void actividadesVertice(const std::list<Vertice> &vertices);
 
 void calcRutaCorta(string origen, string destino);
 void encontrarRuta(Vertice *origen, Vertice *destino, std::vector<Vertice *> &listaRutaVertices, std::vector<std::vector<Vertice *>> &listaRutaTodosVertices, std::vector<int> &listaDistancias, int distanciaTotal);
+
+void amplitud(Vertice *inicio);
+void profundidad(Vertice *inicio);
+void profundidadRecursivo(Vertice *actual, std::list<Vertice *> &visitados);
 
 void agregarPersona();
 
@@ -791,7 +795,7 @@ void menu()
     cout << "\n1. Menu Personas";
     cout << "\n2. Menu Ciudades";
     cout << "\n3. Menu Rutas";
-    cout << "\n4. Mostrar Actividades";
+    cout << "\n4. Menu Actividades";
     cout << "\n0. Salir \n";
     cout << ">";
 }
@@ -822,9 +826,16 @@ void menuRutas()
     cout << "\n0. Salir \n";
     cout << ">";
 }
+void menuActividad()
+{
+    cout << "\n1. Mostrar todas las actividades";
+    cout << "\n2. Mostrar actividad por vertice";
+    cout << "\n0. Salir\n>";
+}
 
 int main()
 {
+
     string origen, destino;
 
     cargarDatos();
@@ -1012,7 +1023,22 @@ int main()
             }
         }
         else if (opcion == 4)
-            getListaActividades(listaActividades);
+        {
+            int opcionAct;
+            while (true)
+            {
+                menuActividad();
+                cin >> opcionAct;
+                if (opcionAct == 1)
+                    getListaActividades(listaActividades);
+                else if (opcionAct == 2)
+                {
+                    actividadesVertice(listaVertices);
+                }
+                else if (opcionAct == 0)
+                    break;
+            }
+        }
 
         else if (opcion == 0)
             break;
@@ -1020,7 +1046,6 @@ int main()
 
     return 0;
 }
-
 
 void getListaVertices(list<Vertice> listaVertices)
 {
@@ -1081,6 +1106,18 @@ void getActividad(const std::list<std::string> &listaActividades)
     }
 }
 
+void actividadesVertice(const std::list<Vertice> &vertices)
+{
+    for (const auto &vert : vertices)
+    {
+        std::cout << vert.nombre << std::endl;
+        for (const auto &actPtr : vert.actividades)
+        {
+            std::cout << "-" << *actPtr << std::endl; // Imprime el contenido apuntado por el puntero
+        }
+    }
+}
+
 // Función para agregar un vértice a una lista de vértices
 void createVertice(list<Vertice *> &vertices, string nombreV)
 {
@@ -1118,9 +1155,11 @@ void modificarArco(Vertice &vertice, string nombreDestino, int nuevaDistancia, V
 }
 
 // Función para eliminar un arco
-void eliminarVertice(std::list<Vertice>& listaVertices, const Vertice& vertice) {
+void eliminarVertice(std::list<Vertice> &listaVertices, const Vertice &vertice)
+{
     auto it = std::find(listaVertices.begin(), listaVertices.end(), vertice);
-    if (it != listaVertices.end()) {
+    if (it != listaVertices.end())
+    {
         listaVertices.erase(it);
     }
 }
@@ -1208,7 +1247,8 @@ void encontrarRuta(Vertice *origen, Vertice *destino, std::vector<Vertice *> &li
     listaRutaVertices.pop_back();
 }
 
-void agregarPersona(){
+void agregarPersona()
+{
     char genero;
     int edad;
     char origen[15], destino[15], actividad[30];
@@ -1231,4 +1271,62 @@ void agregarPersona(){
     file.write(reinterpret_cast<char *>(&nuevaPersona), sizeof(Persona));
     file.close();
     cout << "Persona agregada con éxito!" << endl;
+}
+
+// Amplitud
+void amplitud(Vertice *inicio)
+{
+    std::queue<Vertice *> cola;
+    std::list<Vertice *> visitados;
+
+    cola.push(inicio);
+    visitados.push_back(inicio);
+
+    while (!cola.empty())
+    {
+        Vertice *actual = cola.front();
+        cola.pop();
+
+        std::cout << actual->nombre << " ";
+
+        for (const Arco &arco : actual->arcos)
+        {
+            Vertice *vecino = arco.destino;
+            if (!vecino->visitado)
+            {
+                cola.push(vecino);
+                visitados.push_back(vecino);
+                vecino->visitado = true;
+            }
+        }
+    }
+}
+
+// Profundidad
+void profundidad(Vertice *inicio)
+{
+    if (!inicio)
+        return;
+
+    std::list<Vertice *> visitados;
+    profundidadRecursivo(inicio, visitados);
+}
+
+void profundidadRecursivo(Vertice *actual, std::list<Vertice *> &visitados)
+{
+    if (!actual)
+        return;
+
+    std::cout << actual->nombre << " ";
+    visitados.push_back(actual);
+    actual->visitado = true;
+
+    for (const Arco &arco : actual->arcos)
+    {
+        Vertice *vecino = arco.destino;
+        if (!vecino->visitado)
+        {
+            profundidadRecursivo(vecino, visitados);
+        }
+    }
 }
